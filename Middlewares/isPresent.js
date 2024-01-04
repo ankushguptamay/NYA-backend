@@ -26,3 +26,28 @@ exports.isAdmin = async (req, res, next) => {
         });
     }
 }
+
+exports.isUser = async (req, res, next) => {
+    try {
+        const email = req.user.email;
+        const id = req.user.id;
+        const isUser = await User.findOne({
+            where: {
+                id: id,
+                email: email
+            }
+        });
+        if (!isUser) {
+            return res.status(400).send({
+                success: false,
+                message: "User is not present!"
+            });
+        };
+        next();
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            err: err.message
+        });
+    }
+}

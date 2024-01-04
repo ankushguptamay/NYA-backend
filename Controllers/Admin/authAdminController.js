@@ -4,6 +4,7 @@ const { adminLogin, adminRegistration } = require("../../Middlewares/Validate/va
 const bcrypt = require('bcryptjs');
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET_KEY_ADMIN, JWT_VALIDITY } = process.env;
 
 //register Admin
 exports.registerAdmin = async (req, res) => {
@@ -39,7 +40,7 @@ exports.registerAdmin = async (req, res) => {
             id: admin.id,
             email: admin.email,
         }
-        const authToken = jwt.sign(data, process.env.JWT_SECRET_KEY_ADMIN);
+        const authToken = jwt.sign(data, JWT_SECRET_KEY_ADMIN, { expiresIn: JWT_VALIDITY });
         res.status(201).send({
             success: true,
             message: "Admin registered successfully",
@@ -81,7 +82,7 @@ exports.loginAdmin = async (req, res) => {
             id: isAdmin.id,
             email: isAdmin.email
         }
-        const authToken = jwt.sign(data, process.env.JWT_SECRET_KEY_ADMIN);
+        const authToken = jwt.sign(data, JWT_SECRET_KEY_ADMIN, { expiresIn: JWT_VALIDITY });
         res.status(201).send({
             success: true,
             message: "Admin LogedIn successfully",

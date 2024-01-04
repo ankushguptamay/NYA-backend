@@ -4,6 +4,7 @@ const router = express.Router();
 const { registerAdmin, loginAdmin } = require('../Controllers/Admin/authAdminController');
 const { createAasana, getAasanaForAdmin, unPublicAasana, updateAasana, publicAasana, hardDeleteAasana } = require('../Controllers/Admin/aasanaController');
 const { createCategory, getCategory, unPublicCategory, publicCategory, updateCategory } = require('../Controllers/Admin/categoryController');
+const { getAllUser } = require('../Controllers/User/userController');
 const { createSubCategory, getSubCategoryForAdmin, publicSubCategory, updateSubCategory, unPublicSubCategory } = require('../Controllers/Admin/subCategoryController');
 
 
@@ -35,5 +36,8 @@ router.put("/unPublicAasana/:id", verifyAdminToken, isAdmin, unPublicAasana);
 router.put("/publicAasana/:id", verifyAdminToken, isAdmin, publicAasana);
 router.put("/updateAasana/:id", verifyAdminToken, isAdmin, updateAasana);
 router.delete("/hardDeleteAasana/:id", verifyAdminToken, isAdmin, hardDeleteAasana);
+
+// User
+router.get("/users", verifyAdminToken, isAdmin, getAllUser);
 
 module.exports = router;

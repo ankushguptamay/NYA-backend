@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require("cors");
 const admin = require('./Routes/adminRoute');
-
+const user = require('./Routes/userRoute');
 
 const app = express();
 
@@ -28,6 +28,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/file', express.static('./Resources'));
 
 app.use("/api/admin", admin);
+app.use("/api/user", admin);
 
 app.get('/api/admin', (req, res) => {
   res.send('Hello Admin!');
