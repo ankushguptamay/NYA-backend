@@ -1,4 +1,4 @@
-const jwt = require('../../Models');
+const db = require('../../Models');
 const User = db.user;
 const { loginUser, registerUser, changePassword } = require("../../Middlewares/Validate/validateUser");
 const { JWT_SECRET_KEY_USER, JWT_VALIDITY } = process.env;
@@ -162,7 +162,7 @@ exports.changePassword = async (req, res) => {
         const authToken = jwt.sign(
             {
                 id: user.id,
-                email: req.body.email
+                email: user.email
             },
             JWT_SECRET_KEY_USER,
             { expiresIn: JWT_VALIDITY } // five day
