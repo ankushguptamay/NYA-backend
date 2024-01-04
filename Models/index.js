@@ -27,6 +27,8 @@ db.subCategory = require('./Admin/subCategoryModel.js')(sequelize, Sequelize);
 
 // User
 db.user = require('./User/userModel.js')(sequelize, Sequelize);
+db.institute = require('./User/institutionModel.js')(sequelize, Sequelize);
+db.instructor = require('./User/instructorModel.js')(sequelize, Sequelize);
 
 // Admin Course Association
 db.category.hasMany(db.subCategory, { foreignKey: "categoryId", as: "subCategories" });

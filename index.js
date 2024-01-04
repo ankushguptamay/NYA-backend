@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require("cors");
 const admin = require('./Routes/adminRoute');
 const user = require('./Routes/userRoute');
+const institute = require('./Routes/instituteRoute');
+const instructor = require('./Routes/instructorRoute');
 
 const app = express();
 
@@ -29,6 +31,8 @@ app.use('/file', express.static('./Resources'));
 
 app.use("/api/admin", admin);
 app.use("/api/user", user);
+app.use("/api/institute", institute);
+app.use("/api/instructor", instructor);
 
 app.get('/api/admin', (req, res) => {
   res.send('Hello Admin!');

@@ -6,7 +6,8 @@ const { createAasana, getAasanaForAdmin, unPublicAasana, updateAasana, publicAas
 const { createCategory, getCategory, unPublicCategory, publicCategory, updateCategory } = require('../Controllers/Admin/categoryController');
 const { getAllUser } = require('../Controllers/User/userController');
 const { createSubCategory, getSubCategoryForAdmin, publicSubCategory, updateSubCategory, unPublicSubCategory } = require('../Controllers/Admin/subCategoryController');
-
+const { getAllInstitute, approveInstitute, disApproveInstitute } = require('../Controllers/User/instituteController');
+const { getAllInstructor, approveInstructor, disApproveInstructor } = require('../Controllers/User/instructorController');
 
 //middleware
 const { verifyAdminToken } = require('../Middlewares/varifyToken');
@@ -39,5 +40,15 @@ router.delete("/hardDeleteAasana/:id", verifyAdminToken, isAdmin, hardDeleteAasa
 
 // User
 router.get("/users", verifyAdminToken, isAdmin, getAllUser);
+
+// Institute
+router.get("/institutes", verifyAdminToken, isAdmin, getAllInstitute);
+router.put("/approveInstitute/:id", verifyAdminToken, isAdmin, approveInstitute);
+router.put("/disApproveInstitute/:id", verifyAdminToken, isAdmin, disApproveInstitute);
+
+// Instructor
+router.get("/instructors", verifyAdminToken, isAdmin, getAllInstructor);
+router.put("/approveInstructor/:id", verifyAdminToken, isAdmin, approveInstructor);
+router.put("/disApproveInstructor/:id", verifyAdminToken, isAdmin, disApproveInstructor);
 
 module.exports = router;
