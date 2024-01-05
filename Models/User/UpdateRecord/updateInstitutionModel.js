@@ -1,14 +1,11 @@
 module.exports = (sequelize, DataTypes) => {
-    const Institute = sequelize.define("institute", {
+    const InstituteUpdation = sequelize.define("instituteUpdations", {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
         },
         centerName: {
-            type: DataTypes.STRING,
-        },
-        password: {
             type: DataTypes.STRING,
         },
         email: {
@@ -30,11 +27,12 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
         },
         approvedByAdmin: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
+            type: DataTypes.BOOLEAN
         }
     }, {
         paranoid: true
     });
-    return Institute;
+    return InstituteUpdation;
 };
+
+// InstituteId

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { register, login, changePassword, getInstitute } = require('../Controllers/User/instituteController');
+const { register, login, changePassword, getInstitute, updateInstitute } = require('../Controllers/User/instituteController');
 
 
 //middleware
@@ -13,5 +13,6 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/changePassword", verifyInstituteToken, changePassword);
 router.get("/institute", verifyInstituteToken, getInstitute);
+router.get("/updateInstitute", verifyInstituteToken, updateInstitute);
 
 module.exports = router;

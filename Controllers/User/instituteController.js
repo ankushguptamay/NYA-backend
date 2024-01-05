@@ -1,6 +1,7 @@
 const db = require('../../Models');
 const Institute = db.institute;
-const { loginUser, registerInstitute, changePassword } = require("../../Middlewares/Validate/validateUser");
+const InstituteUpdation = db.instituteUpdation;
+const { loginUser, registerInstitute, changePassword, updateInstitute } = require("../../Middlewares/Validate/validateUser");
 const { JWT_SECRET_KEY_INSTITUTE, JWT_VALIDITY } = process.env;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -11,8 +12,14 @@ const SALT = 10;
 // login
 // changePassword
 // getInstitute
+// updateInstitute
 
 // getAllInstitute
+// approveInstituteRegistration
+// disApproveInstituteRegistration
+// getAllInstituteUpdation
+// approveInstituteUpdate
+// disApproveInstituteUpdate
 
 exports.register = async (req, res) => {
     try {
@@ -43,12 +50,7 @@ exports.register = async (req, res) => {
         // Create Institute in database
         const institute = await Institute.create({
             email: req.body.email,
-            seatingCapacity: req.body.seatingCapacity,
-            mobileNumber: req.body.mobileNumber,
             centerName: req.body.centerName,
-            location: req.body.location,
-            city: req.body.city,
-            address: req.body.address,
             password: hashedPassword
         });
         // generate JWT Token
@@ -253,7 +255,7 @@ exports.getAllInstitute = async (req, res) => {
         if (search) {
             condition.push({
                 [Op.or]: [
-                    { name: { [Op.substring]: search } },
+                    { centerName: { [Op.substring]: search } },
                     { email: { [Op.substring]: search } }
                 ]
             })
@@ -287,7 +289,7 @@ exports.getAllInstitute = async (req, res) => {
     }
 }
 
-exports.approveInstitute = async (req, res) => {
+exports.approveInstituteRegistration = async (req, res) => {
     try {
         const institute = await Institute.findOne({
             where: {
@@ -318,7 +320,7 @@ exports.approveInstitute = async (req, res) => {
     }
 }
 
-exports.disApproveInstitute = async (req, res) => {
+exports.disApproveInstituteRegistration = async (req, res) => {
     try {
         const institute = await Institute.findOne({
             where: {
@@ -339,6 +341,171 @@ exports.disApproveInstitute = async (req, res) => {
         res.status(200).send({
             success: true,
             message: "Institute disapproved successfully!",
+            data: institute
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+}
+
+exports.updateInstitute = async (req, res) => {
+    try {
+        // Validate Body
+        const { error } = updateInstitute(req.body);
+        if (error) {
+            return res.status(400).send(error.details[0].message);
+        }
+        const institute = await Institute.findOne({
+            where: {
+                email: req.institute.email, id: req.institute.id
+            }
+        });
+        if (!institute) {
+            return res.status(400).send({
+                success: false,
+                message: "Institute is not present!"
+            });
+        }
+        // Check approval status
+        if (institute.approvedByAdmin === false) {
+            return res.status(400).send({
+                success: false,
+                message: "Your profile is not approved by NVA!"
+            });
+        }
+        // create updateInstitute request
+        await InstituteUpdation.create({
+            email: req.institute.email,
+            centerName: institute.centerName,
+            seatingCapacity: req.body.seatingCapacity,
+            mobileNumber: req.body.mobileNumber,
+            location: req.body.location,
+            city: req.body.city,
+            address: req.body.address,
+            instituteId: req.institute.id
+        });
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: 'Updated successfully!'
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.approveInstituteUpdate = async (req, res) => {
+    try {
+        const instituteUpdation = await InstituteUpdation.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        if (!instituteUpdation) {
+            return res.status(400).send({
+                success: false,
+                message: "Institute updation request is not present!"
+            });
+        }
+        // Update institute
+        await Institute.update({
+            seatingCapacity: instituteUpdation.seatingCapacity,
+            mobileNumber: instituteUpdation.mobileNumber,
+            location: instituteUpdation.location,
+            city: instituteUpdation.city,
+            address: instituteUpdation.address,
+        }, { where: { id: instituteUpdation.instituteId } });
+        // update updation request
+        await instituteUpdation.update({ where: { approvedByAdmin: true } });
+        // Soft delete updation request
+        await instituteUpdation.destroy();
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: "Institute updated successfully!"
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+}
+
+exports.disApproveInstituteUpdate = async (req, res) => {
+    try {
+        const instituteUpdation = await InstituteUpdation.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        if (!instituteUpdation) {
+            return res.status(400).send({
+                success: false,
+                message: "Institute updation request is not present!"
+            });
+        }
+        // update updation request
+        await instituteUpdation.update({ where: { approvedByAdmin: false } });
+        // Soft delete updation request
+        await instituteUpdation.destroy();
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: "Institute disapproved successfully!"
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+}
+
+exports.getAllInstituteUpdation = async (req, res) => {
+    try {
+        const { page, search } = req.query;
+        // Pagination
+        const limit = req.query.limit || 10;
+        let offSet = 0;
+        let currentPage = 1;
+        if (page) {
+            offSet = (parseInt(page) - 1) * limit;
+            currentPage = parseInt(page);
+        }
+        // Search 
+        if (search) {
+            condition.push({
+                [Op.or]: [
+                    { centerName: { [Op.substring]: search } },
+                    { email: { [Op.substring]: search } }
+                ]
+            })
+        }
+        const count = await InstituteUpdation.count({
+            where: {
+                [Op.and]: condition
+            }
+        });
+        const institute = await InstituteUpdation.findAll({
+            limit: limit,
+            offset: offSet,
+            where: {
+                [Op.and]: condition
+            }
+        });
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: "All institute updation request fetched successfully!",
+            totalPage: Math.ceil(count / limit),
+            currentPage: currentPage,
             data: institute
         });
     } catch (err) {

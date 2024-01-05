@@ -37,13 +37,6 @@ exports.register = async (req, res) => {
                 message: "Credentials exist!"
             });
         }
-        const trainerAs = (req.body.trainerAs).toUpperCase();
-        if (trainerAs !== 'PUBLIC' || trainerAs !== 'PRIVATE' || trainerAs !== 'GOVERNMENT') {
-            return res.status(400).send({
-                success: false,
-                message: "Public, Private and Government accepted!"
-            });
-        }
         // Hash password
         const salt = await bcrypt.genSalt(SALT);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -51,12 +44,7 @@ exports.register = async (req, res) => {
         const instructor = await Instructor.create({
             email: req.body.email,
             name: req.body.name,
-            mobileNumber: req.body.mobileNumber,
             NYCCertificateNumber: req.body.NYCCertificateNumber,
-            location: req.body.location,
-            city: req.body.city,
-            address: req.body.address,
-            trainerAs: trainerAs,
             password: hashedPassword
         });
         // generate JWT Token
@@ -295,7 +283,7 @@ exports.getAllInstructor = async (req, res) => {
     }
 }
 
-exports.approveInstructor = async (req, res) => {
+exports.approveInstructorRegistration = async (req, res) => {
     try {
         const instructor = await Instructor.findOne({
             where: {
@@ -326,7 +314,7 @@ exports.approveInstructor = async (req, res) => {
     }
 }
 
-exports.disApproveInstructor = async (req, res) => {
+exports.disApproveInstructorRegistration = async (req, res) => {
     try {
         const instructor = await Instructor.findOne({
             where: {
@@ -356,3 +344,71 @@ exports.disApproveInstructor = async (req, res) => {
         });
     }
 }
+
+// exports.updateInstructor = async (req, res) => {
+//     try {
+//         // Validate Body
+//         const { error } = registerInstructor(req.body);
+//         if (error) {
+//             return res.status(400).send(error.details[0].message);
+//         }
+//         // Check in paranoid true
+//         const isInstructor = await Instructor.findOne({
+//             where: {
+//                 [Op.or]: [
+//                     { NYCCertificateNumber: req.body.NYCCertificateNumber },
+//                     { email: req.body.email }
+//                 ]
+//             },
+//             paranoid: false
+//         });
+//         if (isInstructor) {
+//             return res.status(400).send({
+//                 success: false,
+//                 message: "Credentials exist!"
+//             });
+//         }
+//         const trainerAs = (req.body.trainerAs).toUpperCase();
+//         if (trainerAs !== 'PUBLIC' || trainerAs !== 'PRIVATE' || trainerAs !== 'GOVERNMENT') {
+//             return res.status(400).send({
+//                 success: false,
+//                 message: "Public, Private and Government accepted!"
+//             });
+//         }
+//         // Hash password
+//         const salt = await bcrypt.genSalt(SALT);
+//         const hashedPassword = await bcrypt.hash(req.body.password, salt);
+//         // Create Instructor in database
+//         const instructor = await Instructor.create({
+//             email: req.body.email,
+//             name: req.body.name,
+//             mobileNumber: req.body.mobileNumber,
+//             NYCCertificateNumber: req.body.NYCCertificateNumber,
+//             location: req.body.location,
+//             city: req.body.city,
+//             address: req.body.address,
+//             trainerAs: trainerAs,
+//             password: hashedPassword
+//         });
+//         // generate JWT Token
+//         const authToken = jwt.sign(
+//             {
+//                 id: instructor.id,
+//                 email: req.body.email
+//             },
+//             JWT_SECRET_KEY_INSTRUCTOR,
+//             { expiresIn: JWT_VALIDITY } // five day
+//         );
+//         // Send final success response
+//         res.status(200).send({
+//             success: true,
+//             message: 'Registered successfully!',
+//             authToken: authToken
+//         });
+//     } catch (err) {
+//         res.status(500).send({
+//             success: false,
+//             message: err.message
+//         });
+//     }
+// };
