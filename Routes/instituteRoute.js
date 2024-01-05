@@ -13,6 +13,6 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/changePassword", verifyInstituteToken, changePassword);
 router.get("/institute", verifyInstituteToken, getInstitute);
-router.get("/updateInstitute", verifyInstituteToken, updateInstitute);
+router.put("/updateInstitute", verifyInstituteToken, updateInstitute);
 
 module.exports = router;

@@ -7,7 +7,7 @@ const { createCategory, getCategory, unPublicCategory, publicCategory, updateCat
 const { getAllUser } = require('../Controllers/User/userController');
 const { createSubCategory, getSubCategoryForAdmin, publicSubCategory, updateSubCategory, unPublicSubCategory } = require('../Controllers/Admin/subCategoryController');
 const { getAllInstitute, approveInstituteRegistration, disApproveInstituteRegistration, getAllInstituteUpdation, approveInstituteUpdate, disApproveInstituteUpdate } = require('../Controllers/User/instituteController');
-const { getAllInstructor, approveInstructorRegistration, disApproveInstructorRegistration } = require('../Controllers/User/instructorController');
+const { getAllInstructor, approveInstructorRegistration, disApproveInstructorRegistration, getAllInstructorUpdation, disApproveInstructorUpdation, approveInstructorUpdation } = require('../Controllers/User/instructorController');
 
 //middleware
 const { verifyAdminToken } = require('../Middlewares/varifyToken');
@@ -53,5 +53,8 @@ router.put("/disApproveInstituteUpdate/:id", verifyAdminToken, isAdmin, disAppro
 router.get("/instructors", verifyAdminToken, isAdmin, getAllInstructor);
 router.put("/approveInstructorRegistration/:id", verifyAdminToken, isAdmin, approveInstructorRegistration);
 router.put("/disApproveInstructorRegistration/:id", verifyAdminToken, isAdmin, disApproveInstructorRegistration);
+router.get("/instructorsUpdation", verifyAdminToken, isAdmin, getAllInstructorUpdation);
+router.put("/approveInstructorUpdation/:id", verifyAdminToken, isAdmin, approveInstructorUpdation);
+router.put("/disApproveInstructorUpdation/:id", verifyAdminToken, isAdmin, disApproveInstructorUpdation);
 
 module.exports = router;

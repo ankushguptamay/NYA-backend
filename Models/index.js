@@ -29,6 +29,7 @@ db.subCategory = require('./Admin/subCategoryModel.js')(sequelize, Sequelize);
 db.user = require('./User/userModel.js')(sequelize, Sequelize);
 db.institute = require('./User/institutionModel.js')(sequelize, Sequelize);
 db.instituteUpdation = require('./User/UpdateRecord/updateInstitutionModel.js')(sequelize, Sequelize);
+db.instructorUpdation = require('./User/UpdateRecord/updateInstructorModel.js')(sequelize, Sequelize);
 db.instructor = require('./User/instructorModel.js')(sequelize, Sequelize);
 db.event = require('./User/eventModel.js')(sequelize, Sequelize);
 
@@ -44,5 +45,8 @@ db.aasana.belongsTo(db.subCategory, { foreignKey: "subCategoryId", as: "subCateg
 
 db.institute.hasMany(db.instituteUpdation, { foreignKey: "instituteId", as: "instituteUpdations" });
 db.instituteUpdation.belongsTo(db.institute, { foreignKey: "instituteId", as: "institute" });
+
+db.instructor.hasMany(db.instructorUpdation, { foreignKey: "instructorId", as: "instructorUpdations" });
+db.instructorUpdation.belongsTo(db.instructor, { foreignKey: "instructorId", as: "instructor" });
 
 module.exports = db;

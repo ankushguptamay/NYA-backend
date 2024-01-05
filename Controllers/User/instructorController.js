@@ -1,6 +1,7 @@
 const db = require('../../Models');
 const Instructor = db.instructor;
-const { loginUser, registerInstructor, changePassword } = require("../../Middlewares/Validate/validateUser");
+const InstructorUpdation = db.instructorUpdation;
+const { loginUser, registerInstructor, changePassword, updateInstructor } = require("../../Middlewares/Validate/validateUser");
 const { JWT_SECRET_KEY_INSTRUCTOR, JWT_VALIDITY } = process.env;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -11,8 +12,14 @@ const SALT = 10;
 // login
 // changePassword
 // getInstructor
+// updateInstructor
 
 // getAllInstructor
+// approveInstructorRegistration
+// disApproveInstructorRegistration
+// getAllInstructorUpdation
+// approveInstructorUpdation
+// disApproveInstructorUpdation
 
 exports.register = async (req, res) => {
     try {
@@ -345,70 +352,183 @@ exports.disApproveInstructorRegistration = async (req, res) => {
     }
 }
 
-// exports.updateInstructor = async (req, res) => {
-//     try {
-//         // Validate Body
-//         const { error } = registerInstructor(req.body);
-//         if (error) {
-//             return res.status(400).send(error.details[0].message);
-//         }
-//         // Check in paranoid true
-//         const isInstructor = await Instructor.findOne({
-//             where: {
-//                 [Op.or]: [
-//                     { NYCCertificateNumber: req.body.NYCCertificateNumber },
-//                     { email: req.body.email }
-//                 ]
-//             },
-//             paranoid: false
-//         });
-//         if (isInstructor) {
-//             return res.status(400).send({
-//                 success: false,
-//                 message: "Credentials exist!"
-//             });
-//         }
-//         const trainerAs = (req.body.trainerAs).toUpperCase();
-//         if (trainerAs !== 'PUBLIC' || trainerAs !== 'PRIVATE' || trainerAs !== 'GOVERNMENT') {
-//             return res.status(400).send({
-//                 success: false,
-//                 message: "Public, Private and Government accepted!"
-//             });
-//         }
-//         // Hash password
-//         const salt = await bcrypt.genSalt(SALT);
-//         const hashedPassword = await bcrypt.hash(req.body.password, salt);
-//         // Create Instructor in database
-//         const instructor = await Instructor.create({
-//             email: req.body.email,
-//             name: req.body.name,
-//             mobileNumber: req.body.mobileNumber,
-//             NYCCertificateNumber: req.body.NYCCertificateNumber,
-//             location: req.body.location,
-//             city: req.body.city,
-//             address: req.body.address,
-//             trainerAs: trainerAs,
-//             password: hashedPassword
-//         });
-//         // generate JWT Token
-//         const authToken = jwt.sign(
-//             {
-//                 id: instructor.id,
-//                 email: req.body.email
-//             },
-//             JWT_SECRET_KEY_INSTRUCTOR,
-//             { expiresIn: JWT_VALIDITY } // five day
-//         );
-//         // Send final success response
-//         res.status(200).send({
-//             success: true,
-//             message: 'Registered successfully!',
-//             authToken: authToken
-//         });
-//     } catch (err) {
-//         res.status(500).send({
-//             success: false,
-//             message: err.message
-//         });
-//     }
-// };
+exports.updateInstructor = async (req, res) => {
+    try {
+        // Validate Body
+        const { error } = updateInstructor(req.body);
+        if (error) {
+            return res.status(400).send(error.details[0].message);
+        }
+        // Check
+        const isInstructor = await Instructor.findOne({
+            where: {
+                id: req.instructor.id,
+                email: req.instructor.email
+            }
+        });
+        if (!isInstructor) {
+            return res.status(400).send({
+                success: false,
+                message: "Instructor is not present!"
+            });
+        };
+        // Check approval status
+        if (isInstructor.approvedByAdmin === false) {
+            return res.status(400).send({
+                success: false,
+                message: "Your profile is not approved by NVA!"
+            });
+        }
+        const trainerAs = (req.body.trainerAs).toUpperCase();
+        if (trainerAs !== 'PUBLIC' || trainerAs !== 'PRIVATE' || trainerAs !== 'GOVERNMENT') {
+            return res.status(400).send({
+                success: false,
+                message: "Public, Private and Government accepted!"
+            });
+        }
+        // Create Instructor in database
+        await InstructorUpdation.create({
+            email: req.instructor.email,
+            NYCCertificateNumber: isInstructor.NYCCertificateNumber,
+            name: req.body.name,
+            mobileNumber: req.body.mobileNumber,
+            location: req.body.location,
+            city: req.body.city,
+            address: req.body.address,
+            trainerAs: trainerAs,
+            instructorId: req.instructor.id
+        });
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: 'Updated successfully!'
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.getAllInstructorUpdation = async (req, res) => {
+    try {
+        const { page, search } = req.query;
+        // Pagination
+        const limit = req.query.limit || 10;
+        let offSet = 0;
+        let currentPage = 1;
+        if (page) {
+            offSet = (parseInt(page) - 1) * limit;
+            currentPage = parseInt(page);
+        }
+        // Search 
+        const condition = [];
+        if (search) {
+            condition.push({
+                [Op.or]: [
+                    { name: { [Op.substring]: search } },
+                    { email: { [Op.substring]: search } }
+                ]
+            })
+        }
+        const count = await InstructorUpdation.count({
+            where: {
+                [Op.and]: condition
+            }
+        });
+        const instructor = await InstructorUpdation.findAll({
+            limit: limit,
+            offset: offSet,
+            where: {
+                [Op.and]: condition
+            },
+            attributes: { exclude: ['password'] }
+        });
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: "All instructor fetched successfully!",
+            totalPage: Math.ceil(count / limit),
+            currentPage: currentPage,
+            data: instructor
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+}
+
+exports.approveInstructorUpdation = async (req, res) => {
+    try {
+        const instructorUpdation = await InstructorUpdation.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        if (!instructorUpdation) {
+            return res.status(400).send({
+                success: false,
+                message: "Instructor updation request is not present!"
+            });
+        }
+        await Instructor.update({
+            name: instructorUpdation.name,
+            mobileNumber: instructorUpdation.mobileNumber,
+            location: instructorUpdation.location,
+            city: instructorUpdation.city,
+            address: instructorUpdation.address,
+            trainerAs: instructorUpdation.trainerAs,
+        }, {
+            where: {
+                id: instructorUpdation.instructorId
+            }
+        });
+        // update updation request
+        await instructorUpdation.update({ where: { approvedByAdmin: true } });
+        // Soft delete updation request
+        await instructorUpdation.destroy();
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: "Instructor updated successfully!"
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+}
+
+exports.disApproveInstructorUpdation = async (req, res) => {
+    try {
+        const instructorUpdation = await InstructorUpdation.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        if (!instructorUpdation) {
+            return res.status(400).send({
+                success: false,
+                message: "Instructor updation request is not present!"
+            });
+        }
+        // update updation request
+        await instructorUpdation.update({ where: { approvedByAdmin: true } });
+        // Soft delete updation request
+        await instructorUpdation.destroy();
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: "Instructor disapproved successfully!"
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+}

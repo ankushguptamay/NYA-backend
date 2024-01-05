@@ -360,7 +360,8 @@ exports.updateInstitute = async (req, res) => {
         }
         const institute = await Institute.findOne({
             where: {
-                email: req.institute.email, id: req.institute.id
+                email: req.institute.email, 
+                id: req.institute.id
             }
         });
         if (!institute) {
