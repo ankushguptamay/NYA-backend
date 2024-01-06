@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Event = sequelize.define("events", {
+    const EventUpdation = sequelize.define("eventUpdations", {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
@@ -30,8 +30,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
         approvedByAdmin: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
+            type: DataTypes.BOOLEAN
         },
         createrId:{
             type: DataTypes.STRING
@@ -39,5 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         paranoid: true
     });
-    return Event;
+    return EventUpdation;
 };
+
+// eventId
