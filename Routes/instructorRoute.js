@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { register, login, changePassword, getInstructor, updateInstructor } = require('../Controllers/User/instructorController');
 const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
+const { eventBookByUser } = require('../Controllers/User/event_userController');
 
 //middleware
 const { verifyInstructorToken } = require('../Middlewares/varifyToken');
@@ -21,5 +22,6 @@ router.post("/createEvent", verifyInstructorToken, isInstructor, uploadImage.sin
 router.get("/events", verifyInstructorToken, isInstructor, getEventForCreater);
 router.get("/events/:id", verifyInstructorToken, isInstructor, getEventById);
 router.put("/updateEvent/:id", verifyInstructorToken, isInstructor, updateEvent);
+router.get("/eventUsers/:id", verifyInstructorToken, isInstructor, eventBookByUser);
 
 module.exports = router;

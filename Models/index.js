@@ -33,6 +33,7 @@ db.instructorUpdation = require('./User/UpdateRecord/updateInstructorModel.js')(
 db.instructor = require('./User/instructorModel.js')(sequelize, Sequelize);
 db.event = require('./User/eventModel.js')(sequelize, Sequelize);
 db.eventUpdation = require('./User/UpdateRecord/updateEventModel.js')(sequelize, Sequelize);
+db.event_user = require('./User/event_userModel.js')(sequelize, Sequelize);
 
 // Admin Course Association
 db.category.hasMany(db.subCategory, { foreignKey: "categoryId", as: "subCategories" });
@@ -52,5 +53,13 @@ db.instructorUpdation.belongsTo(db.instructor, { foreignKey: "instructorId", as:
 
 db.event.hasMany(db.eventUpdation, { foreignKey: "eventId", as: "eventUpdations" });
 db.eventUpdation.belongsTo(db.event, { foreignKey: "eventId", as: "event" });
+
+// Event and event_user
+db.event.hasMany(db.event_user, { foreignKey: "eventId", as: "event_user" });
+db.event_user.belongsTo(db.event, { foreignKey: "eventId", as: "event" });
+
+// user and event_user
+db.user.hasMany(db.event_user, { foreignKey: "userId", as: "event_user" });
+db.event_user.belongsTo(db.user, { foreignKey: "userId", as: "user" });
 
 module.exports = db;

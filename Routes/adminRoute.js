@@ -9,6 +9,7 @@ const { createSubCategory, getSubCategoryForAdmin, publicSubCategory, updateSubC
 const { getAllInstitute, approveInstituteRegistration, disApproveInstituteRegistration, getAllInstituteUpdation, approveInstituteUpdate, disApproveInstituteUpdate } = require('../Controllers/User/instituteController');
 const { getAllInstructor, approveInstructorRegistration, disApproveInstructorRegistration, getAllInstructorUpdation, disApproveInstructorUpdation, approveInstructorUpdation } = require('../Controllers/User/instructorController');
 const { getEventForAdmin, approveEventCreation, disApproveEventCreation, getEventById, approveEventUpdation, disApproveEventUpdation, getEventUpdationForAdmin } = require('../Controllers/User/eventController');
+const { eventBookByUser } = require('../Controllers/User/event_userController');
 
 //middleware
 const { verifyAdminToken } = require('../Middlewares/varifyToken');
@@ -66,5 +67,6 @@ router.put("/approveEventCreation/:id", verifyAdminToken, isAdmin, approveEventC
 router.put("/disApproveEventCreation/:id", verifyAdminToken, isAdmin, disApproveEventCreation);
 router.put("/approveEventUpdation/:id", verifyAdminToken, isAdmin, approveEventUpdation);
 router.put("/disApproveEventUpdation/:id", verifyAdminToken, isAdmin, disApproveEventUpdation);
+router.get("/eventUsers/:id", verifyAdminToken, isAdmin, eventBookByUser); // id = event's id
 
 module.exports = router;
