@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { register, login, changePassword, getInstitute, updateInstitute } = require('../Controllers/User/instituteController');
-const { createEvent, getEventForCreater, getEventById } = require('../Controllers/User/eventController');
+const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
 
 
 //middleware
@@ -21,5 +21,6 @@ router.put("/updateInstitute", verifyInstituteToken, updateInstitute);
 router.post("/createEvent", verifyInstituteToken, isInstitute, uploadImage.single("eventImage"), createEvent);
 router.get("/events", verifyInstituteToken, isInstitute, getEventForCreater);
 router.get("/events/:id", verifyInstituteToken, isInstitute, getEventById);
+router.put("/updateEvent/:id", verifyInstituteToken, isInstitute, updateEvent);
 
 module.exports = router;

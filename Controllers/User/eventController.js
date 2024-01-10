@@ -12,6 +12,9 @@ const { Op } = require('sequelize');
 // getEventById
 // approveEventCreation
 // disApproveEventCreation
+// updateEvent
+// approveEventUpdation
+// disApproveEventUpdation
 
 exports.createEvent = async (req, res) => {
     try {
@@ -262,7 +265,6 @@ exports.getEventById = async (req, res) => {
 
 exports.approveEventCreation = async (req, res) => {
     try {
-
         const event = await Event.findOne({
             where: {
                 id: req.params.id
@@ -314,6 +316,194 @@ exports.disApproveEventCreation = async (req, res) => {
         res.status(200).send({
             success: true,
             message: 'Event disApproved successfully!'
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.updateEvent = async (req, res) => {
+    try {
+        //File
+        if (!req.file) {
+            return res.status(400).send({
+                success: false,
+                message: "Select a Image!"
+            });
+        }
+        // Validate Body
+        const { error } = createEvent(req.body);
+        if (error) {
+            deleteSingleFile(req.file.path);
+            return res.status(400).send(error.details[0].message);
+        }
+        const create = req.instructor ? req.instructor : req.institute;
+        const createrId = create.id;
+        const event = await Event.findOne({
+            where: {
+                id: req.params.id,
+                createrId: createrId
+            }
+        });
+        if (!event) {
+            return res.status(400).send({
+                success: false,
+                message: "Such event is not present!"
+            });
+        }
+        const { date_time, eventName, location, aboutEvent } = req.body;
+        // Create event in database
+        await EventUpdation.create({
+            date_time: date_time,
+            eventName: eventName,
+            location: location,
+            aboutEvent: aboutEvent,
+            filePath: req.file.path,
+            imageName: req.file.originalname,
+            imageFileName: req.file.filename,
+            eventId: event.id,
+            createrId: createrId
+        });
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: 'Event updation request created successfully. Wait for NYA Approval!'
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.approveEventUpdation = async (req, res) => {
+    try {
+        const eventUpdation = await EventUpdation.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        if (!eventUpdation) {
+            return res.status(400).send({
+                success: false,
+                message: "Event updation request is not present!"
+            });
+        }
+        // Approve
+        const event = await Event.findOne({
+            where: {
+                id: eventUpdation.eventId
+            }
+        });
+        // Update
+        await event.update({
+            ...event,
+            date_time: eventUpdation.date_time,
+            eventName: eventUpdation.eventName,
+            location: eventUpdation.location,
+            aboutEvent: eventUpdation.aboutEvent,
+            filePath: eventUpdation.req.file.path,
+            imageName: eventUpdation.req.file.originalname,
+            imageFileName: eventUpdation.req.file.filename,
+        });
+        // update updation request
+        await eventUpdation.update({ where: { approvedByAdmin: true } });
+        // Soft delete updation request
+        await eventUpdation.destroy();
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: 'Event approved successfully!'
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.disApproveEventUpdation = async (req, res) => {
+    try {
+        const eventUpdation = await EventUpdation.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        if (!eventUpdation) {
+            return res.status(400).send({
+                success: false,
+                message: "Event updation request is not present!"
+            });
+        }
+        // update updation request
+        await eventUpdation.update({ where: { approvedByAdmin: true } });
+        // Soft delete updation request
+        await eventUpdation.destroy();
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: 'Event disApproved successfully!'
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.getEventUpdationForAdmin = async (req, res) => {
+    try {
+        const { page, limit, search } = req.query;
+        // Pagination
+        const recordLimit = parseInt(limit) || 10;
+        let offSet = 0;
+        let currentPage = 1;
+        if (page) {
+            offSet = (parseInt(page) - 1) * recordLimit;
+            currentPage = parseInt(page);
+        }
+        // Search 
+        const condition = [];
+        if (search) {
+            condition.push({
+                [Op.or]: [
+                    { eventName: { [Op.substring]: search } },
+                    { date_time: { [Op.substring]: search } },
+                    { location: { [Op.substring]: search } }
+                ]
+            })
+        }
+        // Count All Aasana
+        const totalEvent = await EventUpdation.count({
+            where: {
+                [Op.and]: condition
+            },
+            paranoid: false
+        });
+        const eventUpdation = await EventUpdation.findAll({
+            limit: recordLimit,
+            offset: offSet,
+            where: {
+                [Op.and]: condition
+            },
+            paranoid: false,
+            order: [
+                ['createdAt', 'DESC']
+            ]
+        });
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: 'Event fetched successfully!',
+            totalPage: Math.ceil(totalEvent / recordLimit),
+            currentPage: currentPage,
+            data: eventUpdation
         });
     } catch (err) {
         res.status(500).send({

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { register, login, changePassword, getInstructor, updateInstructor } = require('../Controllers/User/instructorController');
-const { createEvent, getEventForCreater, getEventById } = require('../Controllers/User/eventController');
+const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
 
 //middleware
 const { verifyInstructorToken } = require('../Middlewares/varifyToken');
@@ -20,5 +20,6 @@ router.put("/updateInstructor", verifyInstructorToken, updateInstructor);
 router.post("/createEvent", verifyInstructorToken, isInstructor, uploadImage.single("eventImage"), createEvent);
 router.get("/events", verifyInstructorToken, isInstructor, getEventForCreater);
 router.get("/events/:id", verifyInstructorToken, isInstructor, getEventById);
+router.put("/updateEvent/:id", verifyInstructorToken, isInstructor, updateEvent);
 
 module.exports = router;

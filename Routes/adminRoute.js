@@ -8,7 +8,7 @@ const { getAllUser } = require('../Controllers/User/userController');
 const { createSubCategory, getSubCategoryForAdmin, publicSubCategory, updateSubCategory, unPublicSubCategory } = require('../Controllers/Admin/subCategoryController');
 const { getAllInstitute, approveInstituteRegistration, disApproveInstituteRegistration, getAllInstituteUpdation, approveInstituteUpdate, disApproveInstituteUpdate } = require('../Controllers/User/instituteController');
 const { getAllInstructor, approveInstructorRegistration, disApproveInstructorRegistration, getAllInstructorUpdation, disApproveInstructorUpdation, approveInstructorUpdation } = require('../Controllers/User/instructorController');
-const { getEventForAdmin, approveEventCreation, disApproveEventCreation, getEventById } = require('../Controllers/User/eventController');
+const { getEventForAdmin, approveEventCreation, disApproveEventCreation, getEventById, approveEventUpdation, disApproveEventUpdation, getEventUpdationForAdmin } = require('../Controllers/User/eventController');
 
 //middleware
 const { verifyAdminToken } = require('../Middlewares/varifyToken');
@@ -60,8 +60,11 @@ router.put("/disApproveInstructorUpdation/:id", verifyAdminToken, isAdmin, disAp
 
 // Event
 router.get("/events", verifyAdminToken, isAdmin, getEventForAdmin);
+router.get("/getEventUpdation", verifyAdminToken, isAdmin, getEventUpdationForAdmin);
 router.get("/events/:id", verifyAdminToken, isAdmin, getEventById);
 router.put("/approveEventCreation/:id", verifyAdminToken, isAdmin, approveEventCreation);
 router.put("/disApproveEventCreation/:id", verifyAdminToken, isAdmin, disApproveEventCreation);
+router.put("/approveEventUpdation/:id", verifyAdminToken, isAdmin, approveEventUpdation);
+router.put("/disApproveEventUpdation/:id", verifyAdminToken, isAdmin, disApproveEventUpdation);
 
 module.exports = router;
