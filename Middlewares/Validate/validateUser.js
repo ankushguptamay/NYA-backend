@@ -84,3 +84,16 @@ exports.updateInstructor = (data) => {
     }) // .options({ allowUnknown: true });
     return schema.validate(data);
 }
+
+exports.createQuiz = (data) => {
+    const schema = joi.object().keys({
+        quizName: joi.string().required(),
+        details: joi.string().required(),
+        points: joi.string().required(),
+        question: joi.string().required(),
+        option: joi.object().required(),
+        answer: joi.string().required()
+
+    });
+    return schema.validate(data);
+}

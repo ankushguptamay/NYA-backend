@@ -1,21 +1,27 @@
 module.exports = (sequelize, DataTypes) => {
-    const Event = sequelize.define("events", {
-        id: {
+    const Quiz= sequelize.define("quizs", {
+        id: { 
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
         },
-        date_time: {
-            type: DataTypes.DATE
+        quizName: {
+            type: DataTypes.STRING,
         },
-        eventName: {
-            type: DataTypes.STRING
+        details: {
+            type: DataTypes.STRING(1234),
         },
-        location: {
-            type: DataTypes.STRING
+        question: {
+            type: DataTypes.STRING(1234),
         },
-        aboutEvent: {
-            type: DataTypes.STRING(1234)
+        points: {
+            type: DataTypes.STRING,
+        },
+        option: {
+            type: DataTypes.JSON
+        },
+        answer: {
+            type: DataTypes.STRING,
         },
         imagePath: {
             type: DataTypes.STRING(1234)
@@ -26,15 +32,15 @@ module.exports = (sequelize, DataTypes) => {
         imageFileName: {
             type: DataTypes.STRING
         },
+        createrId:{
+            type: DataTypes.STRING
+        },
         approvedByAdmin: {
             type: DataTypes.BOOLEAN,
             defaultValue: false
-        },
-        createrId:{
-            type: DataTypes.STRING
         }
     }, {
         paranoid: true
     });
-    return Event;
+    return Quiz;
 };

@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { register, login, changePassword, getInstitute, updateInstitute } = require('../Controllers/User/instituteController');
 const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
+const { createQuiz, getQuizForCreater, getQuizById } = require('../Controllers/User/quizController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
 
 
@@ -24,5 +25,10 @@ router.get("/events", verifyInstituteToken, isInstitute, getEventForCreater);
 router.get("/events/:id", verifyInstituteToken, isInstitute, getEventById);
 router.put("/updateEvent/:id", verifyInstituteToken, isInstitute, updateEvent);
 router.get("/eventUsers/:id", verifyInstituteToken, isInstitute, eventBookByUser);
+
+// Quiz
+router.post("/createQuiz", verifyInstituteToken, isInstitute, uploadImage.single("quizImage"), createQuiz);
+router.get("/quizs", verifyInstituteToken, isInstitute, getQuizForCreater);
+router.get("/quizs/:id", verifyInstituteToken, isInstitute, getQuizById);
 
 module.exports = router;

@@ -82,7 +82,7 @@ exports.getEventForCreater = async (req, res) => {
                 ]
             })
         }
-        // Count All Aasana
+        // Count All Event
         const totalEvent = await Event.count({
             where: {
                 [Op.and]: condition
@@ -138,7 +138,7 @@ exports.getEventForAdmin = async (req, res) => {
                 ]
             })
         }
-        // Count All Aasana
+        // Count All Event
         const totalEvent = await Event.count({
             where: {
                 [Op.and]: condition
@@ -194,7 +194,7 @@ exports.getEventForUser = async (req, res) => {
                 ]
             })
         }
-        // Count All Aasana
+        // Count All Event
         const totalEvent = await Event.count({
             where: {
                 [Op.and]: condition
@@ -479,7 +479,7 @@ exports.getEventUpdationForAdmin = async (req, res) => {
                 ]
             })
         }
-        // Count All Aasana
+        // Count All Event
         const totalEvent = await EventUpdation.count({
             where: {
                 [Op.and]: condition

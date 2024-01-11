@@ -10,6 +10,7 @@ const { getAllInstitute, approveInstituteRegistration, disApproveInstituteRegist
 const { getAllInstructor, approveInstructorRegistration, disApproveInstructorRegistration, getAllInstructorUpdation, disApproveInstructorUpdation, approveInstructorUpdation } = require('../Controllers/User/instructorController');
 const { getEventForAdmin, approveEventCreation, disApproveEventCreation, getEventById, approveEventUpdation, disApproveEventUpdation, getEventUpdationForAdmin } = require('../Controllers/User/eventController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
+const { getQuizForAdmin, approveQuizCreation, disApproveQuizCreation, getQuizById } = require('../Controllers/User/quizController');
 
 //middleware
 const { verifyAdminToken } = require('../Middlewares/varifyToken');
@@ -68,5 +69,11 @@ router.put("/disApproveEventCreation/:id", verifyAdminToken, isAdmin, disApprove
 router.put("/approveEventUpdation/:id", verifyAdminToken, isAdmin, approveEventUpdation);
 router.put("/disApproveEventUpdation/:id", verifyAdminToken, isAdmin, disApproveEventUpdation);
 router.get("/eventUsers/:id", verifyAdminToken, isAdmin, eventBookByUser); // id = event's id
+
+// Quiz
+router.get("/quizs", verifyAdminToken, isAdmin, getQuizForAdmin);
+router.get("/quizs/:id", verifyAdminToken, isAdmin, getQuizById);
+router.put("/approveQuizCreation/:id", verifyAdminToken, isAdmin, approveQuizCreation);
+router.put("/disApproveQuizCreation/:id", verifyAdminToken, isAdmin, disApproveQuizCreation);
 
 module.exports = router;
