@@ -380,12 +380,6 @@ exports.updateInstructor = async (req, res) => {
             });
         }
         const trainerAs = (req.body.trainerAs).toUpperCase();
-        if (trainerAs !== 'PUBLIC' || trainerAs !== 'PRIVATE' || trainerAs !== 'GOVERNMENT') {
-            return res.status(400).send({
-                success: false,
-                message: "Public, Private and Government accepted!"
-            });
-        }
         // Create Instructor in database
         await InstructorUpdation.create({
             email: req.instructor.email,

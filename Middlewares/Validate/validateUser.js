@@ -79,7 +79,7 @@ exports.updateInstructor = (data) => {
         address: joi.string().required(),
         city: joi.string().required(),
         location: joi.string().required(),
-        trainerAs: joi.string().required()
+        trainerAs: joi.string().valid("PUBLIC", "PRIVATE", "GOVERNMENT").required()
 
     }) // .options({ allowUnknown: true });
     return schema.validate(data);
