@@ -242,3 +242,58 @@ exports.unPublicSubCategory = async (req, res) => {
         });
     }
 };
+
+exports.getSubCategoryForUser = async (req, res) => {
+    try {
+        const { page, limit, search } = req.query;
+        // Pagination
+        const recordLimit = parseInt(limit) || 10;
+        let offSet = 0;
+        let currentPage = 1;
+        if (page) {
+            offSet = (parseInt(page) - 1) * recordLimit;
+            currentPage = parseInt(page);
+        }
+        // Search 
+        const condition = [{ publicStatus: true }];
+        if (search) {
+            condition.push({ subCategoryName: { [Op.substring]: search } });
+        }
+        // Count All Subcategory
+        const totalSubCategory = await SubCategory.count({
+            where: {
+                [Op.and]: condition
+            }
+        });
+        // All Subcategory
+        const subCategories = await SubCategory.findAll({
+            limit: recordLimit,
+            offset: offSet,
+            where: {
+                [Op.and]: condition
+            },
+            include: [{
+                model: Category,
+                where: { publicStatus: true },
+                as: "category",
+                required: false
+            }],
+            order: [
+                ['createdAt', 'DESC']
+            ]
+        });
+        res.status(201).send({
+            success: true,
+            message: "Subcategory fatched successfully",
+            totalPage: Math.ceil(totalSubCategory / recordLimit),
+            currentPage: currentPage,
+            data: subCategories
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            success: false,
+            err: err.message
+        });
+    }
+};

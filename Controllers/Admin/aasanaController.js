@@ -246,3 +246,69 @@ exports.hardDeleteAasana = async (req, res) => {
         });
     }
 };
+
+exports.getAasanaForUser = async (req, res) => {
+    try {
+        const { page, limit, search } = req.query;
+        // Pagination
+        const recordLimit = parseInt(limit) || 10;
+        let offSet = 0;
+        let currentPage = 1;
+        if (page) {
+            offSet = (parseInt(page) - 1) * recordLimit;
+            currentPage = parseInt(page);
+        }
+        // Search 
+        const condition = [{ publicStatus: true }];
+        if (search) {
+            condition.push({
+                [Op.or]: [
+                    { aasanaName: { [Op.substring]: search } },
+                    { aasanaTag: { [Op.substring]: search } },
+                    { aasanaDescription: { [Op.substring]: search } }
+                ]
+            })
+        }
+        // Count All Aasana
+        const totalAasana = await Aasana.count({
+            where: {
+                [Op.and]: condition
+            }
+        });
+        // All Aasana
+        const aasana = await Aasana.findAll({
+            limit: recordLimit,
+            offset: offSet,
+            where: {
+                [Op.and]: condition
+            },
+            include: [{
+                model: Category,
+                as: "category",
+                where: { publicStatus: true },
+                required: false
+            }, {
+                model: SubCategory,
+                as: "subCategory",
+                where: { publicStatus: true },
+                required: false
+            }],
+            order: [
+                ['createdAt', 'DESC']
+            ]
+        });
+        res.status(201).send({
+            success: true,
+            message: "Aasana fatched successfully",
+            totalPage: Math.ceil(totalAasana / recordLimit),
+            currentPage: currentPage,
+            data: aasana
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            success: false,
+            err: err.message
+        });
+    }
+};

@@ -406,9 +406,9 @@ exports.approveEventUpdation = async (req, res) => {
             eventName: eventUpdation.eventName,
             location: eventUpdation.location,
             aboutEvent: eventUpdation.aboutEvent,
-            filePath: eventUpdation.req.file.path,
-            imageName: eventUpdation.req.file.originalname,
-            imageFileName: eventUpdation.req.file.filename,
+            filePath: eventUpdation.filePath,
+            imageName: eventUpdation.imageName,
+            imageFileName: eventUpdation.imageFileName
         });
         // update updation request
         await eventUpdation.update({ where: { approvedByAdmin: true } });

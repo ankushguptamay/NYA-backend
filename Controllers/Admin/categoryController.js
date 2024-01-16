@@ -204,3 +204,27 @@ exports.unPublishCategory = async (req, res) => {
         });
     }
 };
+
+exports.getCategoryForUser = async (req, res) => {
+    try {
+        const category = await Category.findAll({
+            where: {
+                publicStatus: true
+            },
+            order: [
+                ['createdAt', 'DESC']
+            ]
+        });
+        res.status(201).send({
+            success: true,
+            message: "Category fatched successfully",
+            data: category
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            success: false,
+            err: err.message
+        });
+    }
+};
