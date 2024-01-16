@@ -171,7 +171,7 @@ exports.publicAasana = async (req, res) => {
         });
         res.status(201).send({
             success: true,
-            message: "Aasana public successfully"
+            message: "Aasana publish successfully"
         });
     }
     catch (err) {
@@ -204,7 +204,7 @@ exports.unPublicAasana = async (req, res) => {
         });
         res.status(201).send({
             success: true,
-            message: "Aasana un public successfully"
+            message: "Aasana un publish successfully"
         });
     }
     catch (err) {

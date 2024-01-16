@@ -23,7 +23,7 @@ router.put("/updateInstitute", verifyInstituteToken, updateInstitute);
 router.post("/createEvent", verifyInstituteToken, isInstitute, uploadImage.single("eventImage"), createEvent);
 router.get("/events", verifyInstituteToken, isInstitute, getEventForCreater);
 router.get("/events/:id", verifyInstituteToken, isInstitute, getEventById);
-router.put("/updateEvent/:id", verifyInstituteToken, isInstitute, updateEvent);
+router.put("/updateEvent/:id", verifyInstituteToken, isInstitute, uploadImage.single("eventImage"), updateEvent);
 router.get("/eventUsers/:id", verifyInstituteToken, isInstitute, eventBookByUser);
 
 // Quiz

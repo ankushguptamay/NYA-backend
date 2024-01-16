@@ -22,11 +22,11 @@ router.put("/updateInstructor", verifyInstructorToken, updateInstructor);
 router.post("/createEvent", verifyInstructorToken, isInstructor, uploadImage.single("eventImage"), createEvent);
 router.get("/events", verifyInstructorToken, isInstructor, getEventForCreater);
 router.get("/events/:id", verifyInstructorToken, isInstructor, getEventById);
-router.put("/updateEvent/:id", verifyInstructorToken, isInstructor, updateEvent);
+router.put("/updateEvent/:id", verifyInstructorToken, isInstructor, uploadImage.single("eventImage"), updateEvent);
 router.get("/eventUsers/:id", verifyInstructorToken, isInstructor, eventBookByUser);
 
 // Quiz
-router.post("/createQuiz", verifyInstructorToken, isInstructor, uploadImage.single("quizImage"), createQuiz); 
+router.post("/createQuiz", verifyInstructorToken, isInstructor, uploadImage.single("quizImage"), createQuiz);
 router.get("/quizs", verifyInstructorToken, isInstructor, getQuizForCreater);
 router.get("/quizs/:id", verifyInstructorToken, isInstructor, getQuizById);
 

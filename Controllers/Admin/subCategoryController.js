@@ -200,7 +200,7 @@ exports.publicSubCategory = async (req, res) => {
         });
         res.status(201).send({
             success: true,
-            message: "Subcategory public successfully"
+            message: "Subcategory publish successfully"
         });
     }
     catch (err) {
@@ -232,7 +232,7 @@ exports.unPublicSubCategory = async (req, res) => {
         });
         res.status(201).send({
             success: true,
-            message: "Subcategory un public successfully"
+            message: "Subcategory un publish successfully"
         });
     }
     catch (err) {

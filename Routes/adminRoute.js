@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { registerAdmin, loginAdmin } = require('../Controllers/Admin/authAdminController');
 const { createAasana, getAasanaForAdmin, unPublicAasana, updateAasana, publicAasana, hardDeleteAasana } = require('../Controllers/Admin/aasanaController');
-const { createCategory, getCategory, unPublicCategory, publicCategory, updateCategory } = require('../Controllers/Admin/categoryController');
+const { createCategory, getCategory, unPublishCategory, publishCategory, updateCategory } = require('../Controllers/Admin/categoryController');
 const { getAllUser } = require('../Controllers/User/userController');
 const { createSubCategory, getSubCategoryForAdmin, publicSubCategory, updateSubCategory, unPublicSubCategory } = require('../Controllers/Admin/subCategoryController');
 const { getAllInstitute, approveInstituteRegistration, disApproveInstituteRegistration, getAllInstituteUpdation, approveInstituteUpdate, disApproveInstituteUpdate } = require('../Controllers/User/instituteController');
@@ -24,20 +24,20 @@ router.post("/login", loginAdmin);
 // Category
 router.post("/createCategory", verifyAdminToken, isAdmin, uploadImage.single("categoryImage"), createCategory);
 router.get("/getCategory", verifyAdminToken, isAdmin, getCategory);
-router.put("/unPublicCategory/:id", verifyAdminToken, isAdmin, unPublicCategory);
-router.put("/publicCategory/:id", verifyAdminToken, isAdmin, publicCategory);
+router.put("/unPublishCategory/:id", verifyAdminToken, isAdmin, unPublishCategory);
+router.put("/publishCategory/:id", verifyAdminToken, isAdmin, publishCategory);
 router.put("/updateCategory/:id", verifyAdminToken, isAdmin, uploadImage.single("categoryImage"), updateCategory);
 //SubCategory
 router.post("/createSubCategory", verifyAdminToken, isAdmin, uploadImage.single("subCategoryImage"), createSubCategory);
 router.get("/getSubCategory", verifyAdminToken, isAdmin, getSubCategoryForAdmin);
-router.put("/publicSubCategory/:id", verifyAdminToken, isAdmin, publicSubCategory);
-router.put("/unPublicSubCategory/:id", verifyAdminToken, isAdmin, unPublicSubCategory);
+router.put("/publishSubCategory/:id", verifyAdminToken, isAdmin, publicSubCategory);
+router.put("/unPublishSubCategory/:id", verifyAdminToken, isAdmin, unPublicSubCategory);
 router.put("/updateSubCategory/:id", verifyAdminToken, isAdmin, uploadImage.single("subCategoryImage"), updateSubCategory);
 // Aasana
 router.post("/createAasana", verifyAdminToken, isAdmin, createAasana);
 router.get("/getAasana", verifyAdminToken, isAdmin, getAasanaForAdmin);
-router.put("/unPublicAasana/:id", verifyAdminToken, isAdmin, unPublicAasana);
-router.put("/publicAasana/:id", verifyAdminToken, isAdmin, publicAasana);
+router.put("/unPublishAasana/:id", verifyAdminToken, isAdmin, unPublicAasana);
+router.put("/publishAasana/:id", verifyAdminToken, isAdmin, publicAasana);
 router.put("/updateAasana/:id", verifyAdminToken, isAdmin, updateAasana);
 router.delete("/hardDeleteAasana/:id", verifyAdminToken, isAdmin, hardDeleteAasana);
 

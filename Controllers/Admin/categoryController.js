@@ -141,7 +141,7 @@ exports.updateCategory = async (req, res) => {
     }
 };
 
-exports.publicCategory = async (req, res) => {
+exports.publishCategory = async (req, res) => {
     try {
         const id = req.params.id;
         const category = await Category.findOne({
@@ -162,7 +162,7 @@ exports.publicCategory = async (req, res) => {
         });
         res.status(201).send({
             success: true,
-            message: "Category public successfully"
+            message: "Category publish successfully"
         });
     }
     catch (err) {
@@ -173,7 +173,7 @@ exports.publicCategory = async (req, res) => {
     }
 };
 
-exports.unPublicCategory = async (req, res) => {
+exports.unPublishCategory = async (req, res) => {
     try {
         const id = req.params.id;
         const category = await Category.findOne({
@@ -194,7 +194,7 @@ exports.unPublicCategory = async (req, res) => {
         });
         res.status(201).send({
             success: true,
-            message: "Category un public successfully"
+            message: "Category un publish successfully"
         });
     }
     catch (err) {
