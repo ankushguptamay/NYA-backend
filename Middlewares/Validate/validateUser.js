@@ -97,3 +97,14 @@ exports.createQuiz = (data) => {
     });
     return schema.validate(data);
 }
+
+exports.createEvent = (data) => {
+    const schema = joi.object().keys({
+        date_time: joi.string().required(),
+        eventName: joi.string().required(),
+        location: joi.string().required(),
+        aboutEvent: joi.string().required()
+
+    });
+    return schema.validate(data);
+}
