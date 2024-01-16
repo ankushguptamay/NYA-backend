@@ -56,8 +56,8 @@ exports.isUser = async (req, res, next) => {
 
 exports.isInstitute = async (req, res, next) => {
     try {
-        const email = req.user.email;
-        const id = req.user.id;
+        const email = req.institute.email;
+        const id = req.institute.id;
         const isInstitute = await Institute.findOne({
             where: {
                 id: id,
@@ -88,8 +88,8 @@ exports.isInstitute = async (req, res, next) => {
 
 exports.isInstructor = async (req, res, next) => {
     try {
-        const email = req.user.email;
-        const id = req.user.id;
+        const email = req.instructor.email;
+        const id = req.instructor.id;
         const isInstructor = await Instructor.findOne({
             where: {
                 id: id,

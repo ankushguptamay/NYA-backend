@@ -360,7 +360,7 @@ exports.updateInstitute = async (req, res) => {
         }
         const institute = await Institute.findOne({
             where: {
-                email: req.institute.email, 
+                email: req.institute.email,
                 id: req.institute.id
             }
         });
@@ -481,6 +481,7 @@ exports.getAllInstituteUpdation = async (req, res) => {
             currentPage = parseInt(page);
         }
         // Search 
+        const condition = [];
         if (search) {
             condition.push({
                 [Op.or]: [
