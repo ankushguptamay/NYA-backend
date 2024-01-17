@@ -65,9 +65,7 @@ exports.eventBookByUser = async (req, res) => {
             }
         }
         const event = await Event.findOne({
-            where: {
-                id: condition
-            }
+            where: condition
         });
         if (!event) {
             return res.status(400).send({
