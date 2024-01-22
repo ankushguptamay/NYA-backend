@@ -30,9 +30,9 @@ router.get("/quizs", verifyUserToken, isUser, getQuizForUser);
 router.get("/quizs/:id", verifyUserToken, isUser, getQuizById);
 
 // Aasana
-router.get("/aasanas", verifyUserToken, isUser, getAasanaForUser);
+router.get("/aasanas", getAasanaForUser);
 // Category
-router.get("/categories", verifyUserToken, isUser, getCategoryForUser);
+router.get("/categories", getCategoryForUser);
 // SubCategory
-router.get("/subCategories", verifyUserToken, isUser, getSubCategoryForUser);
+router.get("/subCategories", getSubCategoryForUser);
 module.exports = router;
