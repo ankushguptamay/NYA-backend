@@ -127,7 +127,8 @@ exports.login = async (req, res) => {
         res.status(200).send({
             success: true,
             message: 'Loged in successfully!',
-            authToken: authToken
+            authToken: authToken,
+            centerName: institute.centerName
         });
     } catch (err) {
         res.status(500).send({
