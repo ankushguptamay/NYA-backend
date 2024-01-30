@@ -297,3 +297,28 @@ exports.getSubCategoryForUser = async (req, res) => {
         });
     }
 };
+
+exports.getSubCategoryForUserByCategoryId = async (req, res) => {
+    try {
+        const subCategories = await SubCategory.findAll({
+            where: {
+                categoryId: req.params.categoryId,
+                publicStatus: true
+            },
+            order: [
+                ['createdAt', 'DESC']
+            ]
+        });
+        res.status(201).send({
+            success: true,
+            message: "Subcategory fatched successfully",
+            data: subCategories
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            success: false,
+            err: err.message
+        });
+    }
+};

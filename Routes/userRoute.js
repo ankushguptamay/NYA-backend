@@ -5,9 +5,9 @@ const { register, login, changePassword, getUser } = require('../Controllers/Use
 const { getEventForUser, getEventById } = require('../Controllers/User/eventController');
 const { bookEvent, myEventForUser } = require('../Controllers/User/event_userController');
 const { getQuizForUser, getQuizById } = require('../Controllers/User/quizController');
-const { getAasanaForUser } = require('../Controllers/Admin/aasanaController');
+const { getAasanaForUser, getAasanaBySubCategoryId } = require('../Controllers/Admin/aasanaController');
 const { getCategoryForUser } = require('../Controllers/Admin/categoryController');
-const { getSubCategoryForUser } = require('../Controllers/Admin/subCategoryController');
+const { getSubCategoryForUser, getSubCategoryForUserByCategoryId } = require('../Controllers/Admin/subCategoryController');
 
 //middleware
 const { verifyUserToken } = require('../Middlewares/varifyToken');
@@ -31,8 +31,10 @@ router.get("/quizs/:id", verifyUserToken, isUser, getQuizById);
 
 // Aasana
 router.get("/aasanas", getAasanaForUser);
+router.get("/aasanas/:subCategoryId", getAasanaBySubCategoryId);
 // Category
 router.get("/categories", getCategoryForUser);
 // SubCategory
 router.get("/subCategories", getSubCategoryForUser);
+router.get("/subCategories/:categoryId", getSubCategoryForUserByCategoryId);
 module.exports = router;

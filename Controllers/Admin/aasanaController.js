@@ -312,3 +312,29 @@ exports.getAasanaForUser = async (req, res) => {
         });
     }
 };
+
+exports.getAasanaBySubCategoryId = async (req, res) => {
+    try {
+        // All Aasana
+        const aasana = await Aasana.findAll({
+            where: {
+                subCategoryId: req.params.subCategoryId,
+                publicStatus: true
+            },
+            order: [
+                ['createdAt', 'DESC']
+            ]
+        });
+        res.status(201).send({
+            success: true,
+            message: "Aasana fatched successfully",
+            data: aasana
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            success: false,
+            err: err.message
+        });
+    }
+};

@@ -5,9 +5,9 @@ const { register, login, changePassword, getInstitute, updateInstitute } = requi
 const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
 const { createQuiz, getQuizForCreater, getQuizById } = require('../Controllers/User/quizController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
-const { getAasanaForUser } = require('../Controllers/Admin/aasanaController');
+const { getAasanaForUser, getAasanaBySubCategoryId } = require('../Controllers/Admin/aasanaController');
 const { getCategoryForUser } = require('../Controllers/Admin/categoryController');
-const { getSubCategoryForUser } = require('../Controllers/Admin/subCategoryController');
+const { getSubCategoryForUser, getSubCategoryForUserByCategoryId } = require('../Controllers/Admin/subCategoryController');
 
 //middleware
 const { verifyInstituteToken } = require('../Middlewares/varifyToken');
@@ -34,10 +34,12 @@ router.get("/quizs", verifyInstituteToken, isInstitute, getQuizForCreater);
 router.get("/quizs/:id", verifyInstituteToken, isInstitute, getQuizById);
 
 // Aasana
-router.get("/aasanas", verifyInstituteToken, isInstitute, getAasanaForUser);
+router.get("/aasanas", getAasanaForUser);
+router.get("/aasanas/:subCategoryId", getAasanaBySubCategoryId);
 // Category
-router.get("/categories", verifyInstituteToken, isInstitute, getCategoryForUser);
+router.get("/categories", getCategoryForUser);
 // SubCategory
-router.get("/subCategories", verifyInstituteToken, isInstitute, getSubCategoryForUser);
+router.get("/subCategories", getSubCategoryForUser);
+router.get("/subCategories/:categoryId", getSubCategoryForUserByCategoryId);
 
 module.exports = router;
