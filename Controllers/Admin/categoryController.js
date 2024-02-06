@@ -3,6 +3,8 @@ const Category = db.category;
 const { validateCategory } = require("../../Middlewares/Validate/validateAdmin");
 const { Op } = require('sequelize');
 const { deleteSingleFile } = require('../../Util/deleteFile');
+const { s3UploadObject, s3DeleteObject } = require("../../Util/fileToS3");
+const fs = require('fs');
 
 exports.createCategory = async (req, res) => {
     try {
@@ -34,10 +36,15 @@ exports.createCategory = async (req, res) => {
                 message: "Category name should be unique!"
             });
         }
+        const imagePath = `./Resources/${(req.file.filename)}`
+        const fileContent = fs.readFileSync(imagePath);
+        const response = await s3UploadObject(req.file.filename, fileContent);
+        deleteSingleFile(req.file.path);
+        const fileAWSPath = response.Location;
         // Create category
         await Category.create({
             categoryName: categoryName,
-            categoryImage_Path: req.file.path,
+            categoryImage_Path: fileAWSPath,
             categoryImage_Originalname: req.file.originalname,
             categoryImage_FileName: req.file.filename
         });
@@ -112,14 +119,20 @@ exports.updateCategory = async (req, res) => {
                 });
             }
         }
+        const previousImage = category.categoryImage_FileName;
         let imagePath = category.categoryImage_Path;
         let imageOriginalName = category.categoryImage_Originalname;
         let imageFileName = category.categoryImage_FileName;
         if (req.file) {
-            imagePath = req.file.path;
+            const image_Path = `./Resources/${(req.file.filename)}`
+            const fileContent = fs.readFileSync(image_Path);
+            const response = await s3UploadObject(req.file.filename, fileContent);
+            deleteSingleFile(req.file.path);
+            const fileAWSPath = response.Location;
+            imagePath = fileAWSPath;
             imageOriginalName = req.file.originalname;
             imageFileName = req.file.filename
-            deleteSingleFile(category.categoryImage_Path);
+            await s3DeleteObject(previousImage);
         }
         // Create category
         await category.update({
