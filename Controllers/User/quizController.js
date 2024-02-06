@@ -3,6 +3,8 @@ const Quiz = db.quiz;
 const { createQuiz } = require("../../Middlewares/Validate/validateUser");
 const { deleteSingleFile } = require('../../Util/deleteFile');
 const { Op } = require('sequelize');
+const { s3UploadObject, s3DeleteObject } = require("../../Util/fileToS3");
+const fs = require('fs');
 
 // createQuiz
 // getQuizForCreater
@@ -33,6 +35,12 @@ exports.createQuiz = async (req, res) => {
         const create = req.instructor ? req.instructor : req.institute;
         const createrId = create.id;
         const { quizName, details, question, points, option, answer } = req.body;
+        // Uploading S3
+        const imagePath = `./Resources/${(req.file.filename)}`
+        const fileContent = fs.readFileSync(imagePath);
+        const response = await s3UploadObject(req.file.filename, fileContent);
+        deleteSingleFile(req.file.path);
+        const fileAWSPath = response.Location;
         // Create Quiz in database
         await Quiz.create({
             quizName: quizName,
@@ -41,7 +49,7 @@ exports.createQuiz = async (req, res) => {
             points: points,
             option: option,
             answer: answer,
-            imagePath: req.file.path,
+            imagePath: fileAWSPath,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
             createrId: createrId

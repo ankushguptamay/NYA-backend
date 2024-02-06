@@ -4,6 +4,8 @@ const EventUpdation = db.eventUpdation;
 const { createEvent } = require("../../Middlewares/Validate/validateUser");
 const { deleteSingleFile } = require('../../Util/deleteFile');
 const { Op } = require('sequelize');
+const { s3UploadObject, s3DeleteObject } = require("../../Util/fileToS3");
+const fs = require('fs');
 
 // createEvent
 // getEventForCreater
@@ -34,13 +36,19 @@ exports.createEvent = async (req, res) => {
         const create = req.instructor ? req.instructor : req.institute;
         const createrId = create.id;
         const { date_time, eventName, location, aboutEvent } = req.body;
+        // Uploading S3
+        const imagePath = `./Resources/${(req.file.filename)}`
+        const fileContent = fs.readFileSync(imagePath);
+        const response = await s3UploadObject(req.file.filename, fileContent);
+        deleteSingleFile(req.file.path);
+        const fileAWSPath = response.Location;
         // Create event in database
         await Event.create({
             date_time: date_time,
             eventName: eventName,
             location: location,
             aboutEvent: aboutEvent,
-            imagePath: req.file.path,
+            imagePath: fileAWSPath,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
             createrId: createrId
@@ -355,13 +363,19 @@ exports.updateEvent = async (req, res) => {
             });
         }
         const { date_time, eventName, location, aboutEvent } = req.body;
+        // Uploading S3
+        const imagePath = `./Resources/${(req.file.filename)}`
+        const fileContent = fs.readFileSync(imagePath);
+        const response = await s3UploadObject(req.file.filename, fileContent);
+        deleteSingleFile(req.file.path);
+        const fileAWSPath = response.Location;
         // Create event in database
         await EventUpdation.create({
             date_time: date_time,
             eventName: eventName,
             location: location,
             aboutEvent: aboutEvent,
-            filePath: req.file.path,
+            filePath: fileAWSPath,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
             eventId: event.id,

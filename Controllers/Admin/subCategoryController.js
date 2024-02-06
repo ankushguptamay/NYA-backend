@@ -4,6 +4,8 @@ const Category = db.category;
 const { validateSubCategory } = require("../../Middlewares/Validate/validateAdmin");
 const { deleteSingleFile } = require('../../Util/deleteFile');
 const { Op } = require('sequelize');
+const { s3UploadObject, s3DeleteObject } = require("../../Util/fileToS3");
+const fs = require('fs');
 
 exports.createSubCategory = async (req, res) => {
     try {
@@ -35,16 +37,21 @@ exports.createSubCategory = async (req, res) => {
                 message: "Subcategory name should be unique!"
             });
         }
+        // Uploading S3
+        const imagePath = `./Resources/${(req.file.filename)}`
+        const fileContent = fs.readFileSync(imagePath);
+        const response = await s3UploadObject(req.file.filename, fileContent);
+        deleteSingleFile(req.file.path);
+        const fileAWSPath = response.Location;
         // Create category
         await SubCategory.create({
             subCategoryDescription: subCategoryDescription,
             subCategoryName: subCategoryName,
-            subCategoryImage_Path: req.file.path,
+            subCategoryImage_Path: fileAWSPath,
             subCategoryImage_Originalname: req.file.originalname,
             subCategoryImage_FileName: req.file.filename,
             categoryId: categoryId
         });
-
         res.status(201).send({
             success: true,
             message: "Sub category created successfully"
@@ -116,7 +123,9 @@ exports.updateSubCategory = async (req, res) => {
         // Validate body
         const { error } = validateSubCategory(req.body);
         if (error) {
-            deleteSingleFile(req.file.path);
+            if (req.file) {
+                deleteSingleFile(req.file.path);
+            }
             return res.status(400).send(error.details[0].message);
         }
         const id = req.params.id;
@@ -148,14 +157,20 @@ exports.updateSubCategory = async (req, res) => {
                 });
             }
         }
+        const previousImage = subCategory.subCategoryImage_FileName;
         let imagePath = subCategory.subCategoryImage_Path;
         let imageOriginalName = subCategory.subCategoryImage_Originalname;
         let imageFileName = subCategory.subCategoryImage_FileName;
         if (req.file) {
-            imagePath = req.file.path;
+            const image_Path = `./Resources/${(req.file.filename)}`
+            const fileContent = fs.readFileSync(image_Path);
+            const response = await s3UploadObject(req.file.filename, fileContent);
+            deleteSingleFile(req.file.path);
+            const fileAWSPath = response.Location;
+            imagePath = fileAWSPath;
             imageOriginalName = req.file.originalname;
             imageFileName = req.file.filename
-            deleteSingleFile(subCategory.subCategoryImage_Path);
+            await s3DeleteObject(previousImage);
         }
         // Create Subcategory
         await subCategory.update({

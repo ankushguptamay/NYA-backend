@@ -36,6 +36,7 @@ exports.createCategory = async (req, res) => {
                 message: "Category name should be unique!"
             });
         }
+        // Uploading S3
         const imagePath = `./Resources/${(req.file.filename)}`
         const fileContent = fs.readFileSync(imagePath);
         const response = await s3UploadObject(req.file.filename, fileContent);
@@ -87,6 +88,7 @@ exports.updateCategory = async (req, res) => {
     // Validate body
     const { error } = validateCategory(req.body);
     if (error) {
+        if (req.file) deleteSingleFile(req.file.path);
         return res.status(400).send(error.details[0].message);
     }
     try {
