@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const { register, login, changePassword, getInstitute, updateInstitute } = require('../Controllers/User/instituteController');
+const { register, login, changePassword, getInstitute, updateInstitute, sendOTPForForgetPassword, verifyOTP, generatePassword } = require('../Controllers/User/instituteController');
 const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
 const { createQuiz, getQuizForCreater, getQuizById } = require('../Controllers/User/quizController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
 const { getAasanaForUser, getAasanaBySubCategoryId } = require('../Controllers/Admin/aasanaController');
 const { getCategoryForUser } = require('../Controllers/Admin/categoryController');
 const { getSubCategoryForUser, getSubCategoryForUserByCategoryId } = require('../Controllers/Admin/subCategoryController');
+const { getCelebrity } = require('../Controllers/Admin/celebrityController');
 
 //middleware
 const { verifyInstituteToken } = require('../Middlewares/varifyToken');
@@ -20,6 +21,9 @@ router.post("/login", login);
 router.post("/changePassword", verifyInstituteToken, changePassword);
 router.get("/institute", verifyInstituteToken, getInstitute);
 router.put("/updateInstitute", verifyInstituteToken, updateInstitute);
+router.post("/sendOTP", sendOTPForForgetPassword);
+router.post("/verifyOTP", verifyOTP);
+router.post("/generatePassword", generatePassword);
 
 // Event
 router.post("/createEvent", verifyInstituteToken, isInstitute, uploadImage.single("eventImage"), createEvent);
@@ -41,5 +45,8 @@ router.get("/categories", getCategoryForUser);
 // SubCategory
 router.get("/subCategories", getSubCategoryForUser);
 router.get("/subCategories/:categoryId", getSubCategoryForUserByCategoryId);
+
+// Celebrity
+router.get("/celebrities", verifyInstituteToken, isInstitute, getCelebrity);
 
 module.exports = router;

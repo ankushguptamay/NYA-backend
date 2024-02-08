@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const { register, login, changePassword, getInstructor, updateInstructor } = require('../Controllers/User/instructorController');
+const { register, login, changePassword, getInstructor, updateInstructor, sendOTPForForgetPassword, verifyOTP, generatePassword } = require('../Controllers/User/instructorController');
 const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
 const { createQuiz, getQuizForCreater, getQuizById } = require('../Controllers/User/quizController');
 const { getAasanaForUser, getAasanaBySubCategoryId } = require('../Controllers/Admin/aasanaController');
 const { getCategoryForUser } = require('../Controllers/Admin/categoryController');
 const { getSubCategoryForUser, getSubCategoryForUserByCategoryId } = require('../Controllers/Admin/subCategoryController');
+const { getCelebrity } = require('../Controllers/Admin/celebrityController');
 
 //middleware
 const { verifyInstructorToken } = require('../Middlewares/varifyToken');
@@ -20,6 +21,9 @@ router.post("/login", login);
 router.post("/changePassword", verifyInstructorToken, changePassword);
 router.get("/instructor", verifyInstructorToken, getInstructor);
 router.put("/updateInstructor", verifyInstructorToken, updateInstructor);
+router.post("/sendOTP", sendOTPForForgetPassword);
+router.post("/verifyOTP", verifyOTP);
+router.post("/generatePassword", generatePassword);
 
 // Event
 router.post("/createEvent", verifyInstructorToken, isInstructor, uploadImage.single("eventImage"), createEvent);
@@ -41,5 +45,8 @@ router.get("/categories", getCategoryForUser);
 // SubCategory
 router.get("/subCategories", getSubCategoryForUser);
 router.get("/subCategories/:categoryId", getSubCategoryForUserByCategoryId);
+
+// Celebrity
+router.get("/celebrities", verifyInstructorToken, isInstructor, getCelebrity);
 
 module.exports = router;

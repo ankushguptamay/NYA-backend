@@ -55,3 +55,11 @@ exports.validateAasana = (data) => {
     });
     return schema.validate(data);
 }
+
+exports.validateCelebrity = (data) => {
+    const schema = joi.object().keys({
+        celebrityName: joi.string().required(),
+        videoPath: joi.string().required()
+    });
+    return schema.validate(data);
+}

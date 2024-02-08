@@ -20,12 +20,15 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 // Admin
+db.emailCredential = require('./Admin/bravoEmailCredentialModel.js')(sequelize, Sequelize);
 db.admin = require('./Admin/admin.js')(sequelize, Sequelize);
+db.celebrity = require('./Admin/celebrityModel.js')(sequelize, Sequelize);
 db.aasana = require('./Admin/aasanaModel.js')(sequelize, Sequelize);
 db.category = require('./Admin/categoryModel.js')(sequelize, Sequelize);
 db.subCategory = require('./Admin/subCategoryModel.js')(sequelize, Sequelize);
 
 // User
+db.forgetOTP = require('./User/forgetOTPModel.js')(sequelize, Sequelize);
 db.user = require('./User/userModel.js')(sequelize, Sequelize);
 db.quiz = require('./User/quizModel.js')(sequelize, Sequelize);
 db.institute = require('./User/institutionModel.js')(sequelize, Sequelize);
@@ -62,5 +65,20 @@ db.event_user.belongsTo(db.event, { foreignKey: "eventId", as: "event" });
 // user and event_user
 db.user.hasMany(db.event_user, { foreignKey: "userId", as: "event_user" });
 db.event_user.belongsTo(db.user, { foreignKey: "userId", as: "user" });
+
+// db.emailCredential.findOne({
+//     where: {
+//         email: "morarjidesai19@gmail.com"
+//     }
+// }).then((res) => {
+//     console.log(res);
+//     if (!res) {
+//         db.emailCredential.create({
+//             email: "morarjidesai19@gmail.com",
+//             plateForm: "BREVO",
+//             EMAIL_API_KEY: process.env.EMAIL_API_KEY
+//         });
+//     }
+// }).catch((err) => { console.log(err) });
 
 module.exports = db;

@@ -1,9 +1,13 @@
 const db = require('../../Models');
 const User = db.user;
-const { loginUser, registerUser, changePassword } = require("../../Middlewares/Validate/validateUser");
-const { JWT_SECRET_KEY_USER, JWT_VALIDITY } = process.env;
+const { loginUser, registerUser, changePassword, sendOTP, verifyOTP, generatePassword } = require("../../Middlewares/Validate/validateUser");
+const { JWT_SECRET_KEY_USER, JWT_VALIDITY, FORGET_OTP_VALIDITY, OTP_DIGITS_LENGTH } = process.env;
 const jwt = require("jsonwebtoken");
+const EmailCredential = db.emailCredential;
+const ForgetOTP = db.forgetOTP;
 const bcrypt = require("bcryptjs");
+const emailOTP = require('../../Util/generateOTP');
+const { sendEmail } = require("../../Util/sendEmail");
 const { Op } = require("sequelize");
 const SALT = 10;
 
@@ -259,3 +263,222 @@ exports.getAllUser = async (req, res) => {
         });
     }
 }
+
+exports.sendOTPForForgetPassword = async (req, res) => {
+    try {
+        // Validate body
+        const { error } = sendOTP(req.body);
+        if (error) {
+            return res.status(400).send(error.details[0].message);
+        }
+        const { email } = req.body;
+        const isUser = await User.findOne({
+            where: {
+                email: email
+            }
+        });
+        if (!isUser) {
+            return res.status(400).send({
+                success: false,
+                message: 'Sorry! try to login with currect credentials.'
+            });
+        }
+        // Generate OTP for Email
+        const otp = emailOTP.generateFixedLengthRandomNumber(OTP_DIGITS_LENGTH);
+        // Update sendEmail 0 every day
+        const date = JSON.stringify(new Date());
+        const todayDate = `${date.slice(1, 11)}`;
+        const changeUpdateDate = await EmailCredential.findAll({
+            where: {
+                updatedAt: { [Op.lt]: todayDate }
+            },
+            order: [
+                ['createdAt', 'ASC']
+            ]
+        });
+        for (let i = 0; i < changeUpdateDate.length; i++) {
+            // console.log("hii");
+            await EmailCredential.update({
+                emailSend: 0
+            }, {
+                where: {
+                    id: changeUpdateDate[i].id
+                }
+            });
+        }
+        // finalise email credentiel
+        const emailCredential = await EmailCredential.findAll({
+            order: [
+                ['createdAt', 'ASC']
+            ]
+        });
+        let finaliseEmailCredential;
+        for (let i = 0; i < emailCredential.length; i++) {
+            if (parseInt(emailCredential[i].emailSend) < 300) {
+                finaliseEmailCredential = emailCredential[i];
+                break;
+            }
+        }
+        if (emailCredential.length <= 0) {
+            return res.status(400).send({
+                success: false,
+                message: 'Sorry! Some server error!'
+            });
+        }
+        if (!finaliseEmailCredential) {
+            return res.status(400).send({
+                success: false,
+                message: 'Sorry! Some server error! Try after some time'
+            });
+        }
+        // Send OTP to Email By Brevo
+        if (finaliseEmailCredential.plateForm === "BREVO") {
+            const options = {
+                brevoEmail: finaliseEmailCredential.email,
+                brevoKey: finaliseEmailCredential.EMAIL_API_KEY,
+                headers: { "OTP for regenerate password": "123A" },
+                htmlContent: `OTP ${otp} Expires in ${parseInt(FORGET_OTP_VALIDITY) / 1000 / 60} minutes!`,
+                userEmail: email,
+                userName: isUser.name
+            }
+            const response = await sendEmail(options);
+            // console.log(response);
+            const increaseNumber = parseInt(finaliseEmailCredential.emailSend) + 1;
+            await EmailCredential.update({
+                emailSend: increaseNumber
+            }, { where: { id: finaliseEmailCredential.id } });
+        }
+        //  Store OTP
+        await ForgetOTP.create({
+            vallidTill: new Date().getTime() + parseInt(FORGET_OTP_VALIDITY),
+            otp: otp,
+            userId: isUser.id
+        });
+        res.status(201).send({
+            success: true,
+            message: `OTP send to email successfully! Valid for ${FORGET_OTP_VALIDITY / (60 * 1000)} minutes!`,
+            data: { email: email }
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            success: false,
+            err: err.message
+        });
+    }
+};
+
+exports.verifyOTP = async (req, res) => {
+    try {
+        // Validate body
+        const { error } = verifyOTP(req.body);
+        if (error) {
+            return res.status(400).send(error.details[0].message);
+        }
+        const { email, otp } = req.body;
+        // Is Email Otp exist
+        const isOtp = await ForgetOTP.findOne({
+            where: {
+                otp: otp
+            }
+        });
+        if (!isOtp) {
+            return res.status(400).send({
+                success: false,
+                message: `Invalid OTP!`
+            });
+        }
+        // Checking is user present or not
+        const user = await User.findOne({
+            where: {
+                [Op.and]: [
+                    { email: email }, { id: isOtp.userId }
+                ]
+            }
+        });
+        if (!user) {
+            return res.status(400).send({
+                success: false,
+                message: "No Details Found. Register Now!"
+            });
+        }
+        // is email otp expired?
+        const isOtpExpired = new Date().getTime() > parseInt(isOtp.vallidTill);
+        if (isOtpExpired) {
+            await ForgetOTP.destroy({ where: { userId: isOtp.userId } });
+            return res.status(400).send({
+                success: false,
+                message: `OTP expired!`
+            });
+        }
+        await ForgetOTP.destroy({ where: { userId: isOtp.userId } });
+        res.status(201).send({
+            success: true,
+            message: `OTP matched successfully!`,
+            data: { email: email }
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            success: false,
+            err: err.message
+        });
+    }
+};
+
+exports.generatePassword = async (req, res) => {
+    try {
+        // Validate body
+        const { error } = generatePassword(req.body);
+        if (error) {
+            return res.status(400).send(error.details[0].message);
+        }
+        const { email, password, confirmPassword } = req.body;
+        if (password !== confirmPassword) {
+            return res.status(400).send({
+                success: false,
+                message: "Password should be match!"
+            });
+        }
+        // Checking is user present or not
+        const user = await User.findOne({
+            where: {
+                email: email
+            }
+        });
+        if (!user) {
+            return res.status(400).send({
+                success: false,
+                message: "No Details Found. Register Now!"
+            });
+        }
+        const salt = await bcrypt.genSalt(10);
+        const bcPassword = await bcrypt.hash(password, salt);
+        // Update User
+        await user.update({
+            ...user,
+            password: bcPassword
+        });
+        // Generate Authtoken
+        const authToken = jwt.sign(
+            {
+                id: user.id,
+                email: req.body.email
+            },
+            JWT_SECRET_KEY,
+            { expiresIn: JWT_VALIDITY } // five day
+        );
+        res.status(201).send({
+            success: true,
+            message: `Password generated successfully!`,
+            authToken: authToken,
+            post: user.post
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            success: false,
+            err: err.message
+        });
+    }
+};

@@ -108,3 +108,33 @@ exports.createEvent = (data) => {
     });
     return schema.validate(data);
 }
+
+exports.sendOTP = (data) => {
+    const schema = joi.object().keys({
+        email: joi.string().email().required().label('Email')
+    });
+    return schema.validate(data);
+}
+
+exports.verifyOTP = (data) => {
+    const schema = joi.object().keys({
+        email: joi.string().email().required().label('Email'),
+        otp: joi.string().length(6).required()
+    });
+    return schema.validate(data);
+}
+
+exports.generatePassword = (data) => {
+    const schema = joi.object().keys({
+        email: joi.string().email().required().label('Email'),
+        password: joi.string()
+        // .regex(RegExp(pattern))
+        .required()
+        .min(8),
+        confirmPassword: joi.string()
+        // .regex(RegExp(pattern))
+        .required()
+        .min(8)
+    });
+    return schema.validate(data);
+}

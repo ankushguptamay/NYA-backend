@@ -11,6 +11,7 @@ const { getAllInstructor, approveInstructorRegistration, disApproveInstructorReg
 const { getEventForAdmin, approveEventCreation, disApproveEventCreation, getEventById, approveEventUpdation, disApproveEventUpdation, getEventUpdationForAdmin } = require('../Controllers/User/eventController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
 const { getQuizForAdmin, approveQuizCreation, disApproveQuizCreation, getQuizById } = require('../Controllers/User/quizController');
+const { createCelebrity, getCelebrity, updateCelebrity, deleteCelebrity } = require('../Controllers/Admin/celebrityController');
 
 //middleware
 const { verifyAdminToken } = require('../Middlewares/varifyToken');
@@ -75,5 +76,11 @@ router.get("/quizs", verifyAdminToken, isAdmin, getQuizForAdmin);
 router.get("/quizs/:id", verifyAdminToken, isAdmin, getQuizById);
 router.put("/approveQuizCreation/:id", verifyAdminToken, isAdmin, approveQuizCreation);
 router.put("/disApproveQuizCreation/:id", verifyAdminToken, isAdmin, disApproveQuizCreation);
+
+// Celebrity
+router.post("/createCelebrity", verifyAdminToken, isAdmin, createCelebrity);
+router.get("/celebrities", verifyAdminToken, isAdmin, getCelebrity);
+router.put("/updateCelebrity/:id", verifyAdminToken, isAdmin, updateCelebrity);
+router.delete("/deleteCelebrity/:id", verifyAdminToken, isAdmin, deleteCelebrity);
 
 module.exports = router;
