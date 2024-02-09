@@ -365,6 +365,13 @@ exports.sendOTPForForgetPassword = async (req, res) => {
                             max-width: 100px;
                             height: auto;
                         }
+                        .otp-container{
+                            font-size: 32px;
+                            font-weight: bold;
+                            text-align:center;
+                            color:#1c2e4a;
+                            font-family: 'Poppins', sans-serif;
+                          }
                         .horizontal-line {
                             border-top: 1px solid #ccc;
                             margin: 15px 0;
@@ -377,7 +384,7 @@ exports.sendOTPForForgetPassword = async (req, res) => {
                         <p style='font-size:14px'>Hi <span style=" font-weight:600">${email},</span></p>
                         <p style='font-size:14px;'>Please copy the One Time Password (OTP) below and enter it in the verification page on the  Namaste Yoga APP.</p>
                          <div class="horizontal-line"></div>
-                        <p style="font-size: 32px; font-weight: bold; text-align:center; color:#1c2e4a  font-family: 'Poppins', serif;"> ${otp}</p>
+                         <p class="otp-container"> ${otp}</p>
                         <div class="horizontal-line"></div>
                         
                         <p style='font-size:14px;'>This code <span style="font-weight:600;" >expires in ${parseInt(FORGET_OTP_VALIDITY) / 1000 / 60} minutes.</span>Please,  <span style="font-weight:600;" >DONOT SHARE OR SEND THIS CODE TO ANYONE!</span></p>
