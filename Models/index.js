@@ -66,19 +66,19 @@ db.event_user.belongsTo(db.event, { foreignKey: "eventId", as: "event" });
 db.user.hasMany(db.event_user, { foreignKey: "userId", as: "event_user" });
 db.event_user.belongsTo(db.user, { foreignKey: "userId", as: "user" });
 
-// db.emailCredential.findOne({
-//     where: {
-//         email: "morarjidesai19@gmail.com"
-//     }
-// }).then((res) => {
-//     console.log(res);
-//     if (!res) {
-//         db.emailCredential.create({
-//             email: "morarjidesai19@gmail.com",
-//             plateForm: "BREVO",
-//             EMAIL_API_KEY: process.env.EMAIL_API_KEY
-//         });
-//     }
-// }).catch((err) => { console.log(err) });
+db.emailCredential.findOne({
+    where: {
+        email: "morarjidesai19@gmail.com"
+    }
+}).then((res) => {
+    console.log(res);
+    if (!res) {
+        db.emailCredential.create({
+            email: "morarjidesai19@gmail.com",
+            plateForm: "BREVO",
+            EMAIL_API_KEY: process.env.EMAIL_API_KEY
+        });
+    }
+}).catch((err) => { console.log(err) });
 
 module.exports = db;

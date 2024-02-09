@@ -4,7 +4,7 @@ const InstructorUpdation = db.instructorUpdation;
 const EmailCredential = db.emailCredential;
 const ForgetOTP = db.forgetOTP;
 const { loginUser, registerInstructor, changePassword, updateInstructor, sendOTP, verifyOTP, generatePassword } = require("../../Middlewares/Validate/validateUser");
-const { JWT_SECRET_KEY_INSTRUCTOR, JWT_VALIDITY, FORGET_OTP_VALIDITY, OTP_DIGITS_LENGTH  } = process.env;
+const { JWT_SECRET_KEY_INSTRUCTOR, JWT_VALIDITY, FORGET_OTP_VALIDITY, OTP_DIGITS_LENGTH } = process.env;
 const emailOTP = require('../../Util/generateOTP');
 const { sendEmail } = require("../../Util/sendEmail");
 const jwt = require("jsonwebtoken");
@@ -605,7 +605,54 @@ exports.sendOTPForForgetPassword = async (req, res) => {
                 brevoEmail: finaliseEmailCredential.email,
                 brevoKey: finaliseEmailCredential.EMAIL_API_KEY,
                 headers: { "OTP for regenerate password": "123A" },
-                htmlContent: `OTP ${otp} Expires in ${parseInt(FORGET_OTP_VALIDITY) / 1000 / 60} minutes!`,
+                htmlContent: `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Verification Card</title>
+                        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+                    <style>
+                        body {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            height: 100vh;
+                            margin: 0;
+                            font-family: 'Poppins', sans-serif;
+                        }
+                        .verification-card {
+                            padding: 30px;
+                            border: 1px solid #ccc;
+                            box-shadow: 0 0 10px rgba(0, 0, 255, 0.1);
+                            max-width: 400px;
+                            width: 100%;
+                            font-family: 'Poppins', sans-serif;
+                        }
+                        .logo-img {
+                            max-width: 100px;
+                            height: auto;
+                        }
+                        .horizontal-line {
+                            border-top: 1px solid #ccc;
+                            margin: 15px 0;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="verification-card">
+                        <img src="https://images.unsplash.com/photo-1636051028886-0059ad2383c8?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Logo" class="logo-img">
+                        <p style='font-size:14px'>Hi <span style=" font-weight:600">${email},</span></p>
+                        <p style='font-size:14px;'>Please copy the One Time Password (OTP) below and enter it in the verification page on the Namaste Yoga APP.</p>
+                         <div class="horizontal-line"></div>
+                        <p style="font-size: 32px; font-weight: bold; text-align:center; color:#1c2e4a  font-family: 'Poppins', serif;"> ${otp}</p>
+                        <div class="horizontal-line"></div>
+                        
+                        <p style='font-size:14px;'>This code <span style="font-weight:600;" >expires in ${parseInt(FORGET_OTP_VALIDITY) / 1000 / 60} minutes.</span>Please,  <span style="font-weight:600;" >DONOT SHARE OR SEND THIS CODE TO ANYONE!</span></p>
+                          <div class="horizontal-line"></div>
+                    </div>
+                </body>
+                </html>`,
                 userEmail: email,
                 userName: isInstructor.name
             }
@@ -733,7 +780,7 @@ exports.generatePassword = async (req, res) => {
                 id: instructor.id,
                 email: req.body.email
             },
-            JWT_SECRET_KEY,
+            JWT_SECRET_KEY_INSTRUCTOR,
             { expiresIn: JWT_VALIDITY } // five day
         );
         res.status(201).send({

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { registerAdmin, loginAdmin } = require('../Controllers/Admin/authAdminController');
+const { registerAdmin, loginAdmin, sendOTPForForgetPassword, verifyOTP, generatePassword, changePassword } = require('../Controllers/Admin/authAdminController');
 const { createAasana, getAasanaForAdmin, unPublicAasana, updateAasana, publicAasana, hardDeleteAasana } = require('../Controllers/Admin/aasanaController');
 const { createCategory, getCategory, unPublishCategory, publishCategory, updateCategory } = require('../Controllers/Admin/categoryController');
 const { getAllUser } = require('../Controllers/User/userController');
@@ -22,6 +22,11 @@ const uploadImage = require('../Middlewares/UploadFile/uploadImages');
 // Admin
 router.post("/register", registerAdmin);
 router.post("/login", loginAdmin);
+router.post("/sendOTP", sendOTPForForgetPassword);
+router.post("/verifyOTP", verifyOTP);
+router.post("/generatePassword", generatePassword);
+router.post("/changePassword", verifyAdminToken, changePassword);
+
 // Category
 router.post("/createCategory", verifyAdminToken, isAdmin, uploadImage.single("categoryImage"), createCategory);
 router.get("/getCategory", verifyAdminToken, isAdmin, getCategory);
