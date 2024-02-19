@@ -218,7 +218,7 @@ exports.getAllUser = async (req, res) => {
     try {
         const { page, search } = req.query;
         // Pagination
-        const limit = req.query.limit || 10;
+        const limit = parseInt(req.query.limit) || 10;
         let offSet = 0;
         let currentPage = 1;
         if (page) {
