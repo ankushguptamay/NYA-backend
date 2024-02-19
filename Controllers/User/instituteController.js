@@ -3,7 +3,7 @@ const Institute = db.institute;
 const InstituteUpdation = db.instituteUpdation;
 const EmailCredential = db.emailCredential;
 const ForgetOTP = db.forgetOTP;
-const { loginUser, registerInstitute, changePassword, updateInstitute, sendOTP, verifyOTP, generatePassword } = require("../../Middlewares/Validate/validateUser");
+const { loginByPassword, registerInstitutePassword, changePassword, updateInstitute, sendOTPForgetPassword, verifyOTPForPassword, generatePassword } = require("../../Middlewares/Validate/validateUser");
 const { JWT_SECRET_KEY_INSTITUTE, JWT_VALIDITY, FORGET_OTP_VALIDITY, OTP_DIGITS_LENGTH } = process.env;
 const emailOTP = require('../../Util/generateOTP');
 const { sendEmail } = require("../../Util/sendEmail");
@@ -25,10 +25,10 @@ const SALT = 10;
 // approveInstituteUpdate
 // disApproveInstituteUpdate
 
-exports.register = async (req, res) => {
+exports.registerInstitutePassword = async (req, res) => {
     try {
         // Validate Body
-        const { error } = registerInstitute(req.body);
+        const { error } = registerInstitutePassword(req.body);
         if (error) {
             return res.status(400).send(error.details[0].message);
         }
@@ -80,10 +80,10 @@ exports.register = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
+exports.loginByPassword = async (req, res) => {
     try {
         // Validate Body
-        const { error } = loginUser(req.body);
+        const { error } = loginByPassword(req.body);
         if (error) {
             console.log(error);
             return res.status(400).send(error.details[0].message);
@@ -526,7 +526,7 @@ exports.getAllInstituteUpdation = async (req, res) => {
 exports.sendOTPForForgetPassword = async (req, res) => {
     try {
         // Validate body
-        const { error } = sendOTP(req.body);
+        const { error } = sendOTPForgetPassword(req.body);
         if (error) {
             return res.status(400).send(error.details[0].message);
         }
@@ -681,10 +681,10 @@ exports.sendOTPForForgetPassword = async (req, res) => {
     }
 };
 
-exports.verifyOTP = async (req, res) => {
+exports.verifyOTPForPassword = async (req, res) => {
     try {
         // Validate body
-        const { error } = verifyOTP(req.body);
+        const { error } = verifyOTPForPassword(req.body);
         if (error) {
             return res.status(400).send(error.details[0].message);
         }

@@ -1,7 +1,7 @@
 const joi = require('joi');
 const pattern = "/(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[$@$!#.])[A-Za-zd$@$!%*?&.]{8,20}/";
 
-exports.registerUser = (data) => {
+exports.registerByPassword = (data) => {
     const schema = joi.object().keys({
         name: joi.string().required(),
         email: joi.string().email().required().label('Email'),
@@ -15,7 +15,7 @@ exports.registerUser = (data) => {
     return schema.validate(data);
 }
 
-exports.loginUser = (data) => {
+exports.loginByPassword = (data) => {
     const schema = joi.object().keys({
         email: joi.string().email().required().label('Email'),
         password: joi.string()
@@ -36,7 +36,7 @@ exports.changePassword = (data) => {
     return schema.validate(data);
 }
 
-exports.registerInstitute = (data) => {
+exports.registerInstitutePassword = (data) => {
     const schema = joi.object().keys({
         centerName: joi.string().required(),
         email: joi.string().email().required().label('Email'),
@@ -48,7 +48,7 @@ exports.registerInstitute = (data) => {
     return schema.validate(data);
 }
 
-exports.registerInstructor = (data) => {
+exports.registerInstructorPassword = (data) => {
     const schema = joi.object().keys({
         name: joi.string().required(),
         email: joi.string().email().required().label('Email'),
@@ -109,14 +109,14 @@ exports.createEvent = (data) => {
     return schema.validate(data);
 }
 
-exports.sendOTP = (data) => {
+exports.sendOTPForgetPassword = (data) => {
     const schema = joi.object().keys({
         email: joi.string().email().required().label('Email')
     });
     return schema.validate(data);
 }
 
-exports.verifyOTP = (data) => {
+exports.verifyOTPForPassword = (data) => {
     const schema = joi.object().keys({
         email: joi.string().email().required().label('Email'),
         otp: joi.string().length(6).required()
@@ -128,13 +128,38 @@ exports.generatePassword = (data) => {
     const schema = joi.object().keys({
         email: joi.string().email().required().label('Email'),
         password: joi.string()
-        // .regex(RegExp(pattern))
-        .required()
-        .min(8),
+            // .regex(RegExp(pattern))
+            .required()
+            .min(8),
         confirmPassword: joi.string()
-        // .regex(RegExp(pattern))
-        .required()
-        .min(8)
+            // .regex(RegExp(pattern))
+            .required()
+            .min(8)
     });
+    return schema.validate(data);
+}
+
+exports.registerByMobile = (data) => {
+    const schema = joi.object().keys({
+        name: joi.string().required(),
+        email: joi.string().email().required().label('Email'),
+        mobileNumber: joi.string().length(10).pattern(/^[0-9]+$/).required()
+
+    }) // .options({ allowUnknown: true });
+    return schema.validate(data);
+}
+
+exports.loginByMobile = (data) => {
+    const schema = joi.object().keys({
+        mobileNumber: joi.string().length(10).pattern(/^[0-9]+$/).required()
+    }) // .options({ allowUnknown: true });
+    return schema.validate(data);
+}
+
+exports.otpVerificationByMobile = (data) => {
+    const schema = joi.object().keys({
+        mobileNumber: joi.string().length(10).pattern(/^[0-9]+$/).required(),
+        otp: joi.string().length(6).required()
+    }) // .options({ allowUnknown: true });
     return schema.validate(data);
 }

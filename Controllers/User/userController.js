@@ -1,13 +1,14 @@
 const db = require('../../Models');
 const User = db.user;
-const { loginUser, registerUser, changePassword, sendOTP, verifyOTP, generatePassword } = require("../../Middlewares/Validate/validateUser");
-const { JWT_SECRET_KEY_USER, JWT_VALIDITY, FORGET_OTP_VALIDITY, OTP_DIGITS_LENGTH } = process.env;
+const { loginByPassword, registerByPassword, changePassword, sendOTPForgetPassword, verifyOTPForPassword, generatePassword, registerByMobile, loginByMobile, otpVerificationByMobile } = require("../../Middlewares/Validate/validateUser");
+const { JWT_SECRET_KEY_USER, JWT_VALIDITY, FORGET_OTP_VALIDITY, OTP_DIGITS_LENGTH, OTP_VALIDITY } = process.env;
 const jwt = require("jsonwebtoken");
 const EmailCredential = db.emailCredential;
 const ForgetOTP = db.forgetOTP;
 const bcrypt = require("bcryptjs");
-const emailOTP = require('../../Util/generateOTP');
+const generateOTP = require('../../Util/generateOTP');
 const { sendEmail } = require("../../Util/sendEmail");
+const { sendOTPToMobile } = require('../../Util/sendOTPToMobileNumber');
 const { Op } = require("sequelize");
 const SALT = 10;
 
@@ -18,17 +19,19 @@ const SALT = 10;
 
 // getAllUser
 
-exports.register = async (req, res) => {
+exports.registerByPassword = async (req, res) => {
     try {
         // Validate Body
-        const { error } = registerUser(req.body);
+        const { error } = registerByPassword(req.body);
         if (error) {
             return res.status(400).send(error.details[0].message);
         }
         // Check in paranoid true
         const isUser = await User.findOne({
             where: {
-                email: req.body.email
+                [Op.or]: [
+                    { email: req.body.email }, { mobileNumber: req.body.mobileNumber }
+                ]
             },
             paranoid: false
         });
@@ -71,10 +74,10 @@ exports.register = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
+exports.loginByPassword = async (req, res) => {
     try {
         // Validate Body
-        const { error } = loginUser(req.body);
+        const { error } = loginByPassword(req.body);
         if (error) {
             console.log(error);
             return res.status(400).send(error.details[0].message);
@@ -264,10 +267,10 @@ exports.getAllUser = async (req, res) => {
     }
 }
 
-exports.sendOTPForForgetPassword = async (req, res) => {
+exports.sendOTPForgetPassword = async (req, res) => {
     try {
         // Validate body
-        const { error } = sendOTP(req.body);
+        const { error } = sendOTPForgetPassword(req.body);
         if (error) {
             return res.status(400).send(error.details[0].message);
         }
@@ -284,7 +287,7 @@ exports.sendOTPForForgetPassword = async (req, res) => {
             });
         }
         // Generate OTP for Email
-        const otp = emailOTP.generateFixedLengthRandomNumber(OTP_DIGITS_LENGTH);
+        const otp = generateOTP.generateFixedLengthRandomNumber(OTP_DIGITS_LENGTH);
         // Update sendEmail 0 every day
         const date = JSON.stringify(new Date());
         const todayDate = `${date.slice(1, 11)}`;
@@ -422,10 +425,10 @@ exports.sendOTPForForgetPassword = async (req, res) => {
     }
 };
 
-exports.verifyOTP = async (req, res) => {
+exports.verifyOTPForPassword = async (req, res) => {
     try {
         // Validate body
-        const { error } = verifyOTP(req.body);
+        const { error } = verifyOTPForPassword(req.body);
         if (error) {
             return res.status(400).send(error.details[0].message);
         }
@@ -536,3 +539,172 @@ exports.generatePassword = async (req, res) => {
         });
     }
 };
+
+exports.registerByMobile = async (req, res) => {
+    try {
+        // Body Validation
+        const { error } = registerByMobile(req.body);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: error.details[0].message
+            });
+        }
+        // Check in paranoid true
+        const isUser = await User.findOne({
+            where: {
+                [Op.or]: [
+                    { email: req.body.email }, { mobileNumber: req.body.mobileNumber }
+                ]
+            },
+            paranoid: false
+        });
+        // if (isUser) {
+        //     return res.status(400).send({
+        //         success: false,
+        //         message: "Credentials exist!"
+        //     });
+        // }
+        // Save in DataBase
+        const user = await User.create({
+            ...req.body
+        });
+        // Generate OTP for Email
+        const otp = generateOTP.generateFixedLengthRandomNumber(OTP_DIGITS_LENGTH);
+        // Sending OTP to mobile number
+        const response = await sendOTPToMobile(req.body.mobileNumber, otp);
+        // console.log(response);
+        //  Store OTP
+        await ForgetOTP.create({
+            vallidTill: new Date().getTime() + parseInt(OTP_VALIDITY),
+            otp: otp,
+            userId: user.id
+        });
+        res.status(200).json({
+            success: true,
+            message: `Register successfully! OTP send to ${req.body.mobileNumber}!`,
+            data: {
+                mobileNumber: req.body.mobileNumber
+            }
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.loginByMobile = async (req, res) => {
+    try {
+        // Body Validation
+        const { error } = loginByMobile(req.body);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: error.details[0].message
+            });
+        }
+        // find user in database
+        const user = await User.findOne({
+            where: {
+                mobileNumber: req.body.mobileNumber
+            }
+        });
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'Sorry! try to login with currect credentials.'
+            });
+        }
+        // Generate OTP for Email
+        const otp = generateOTP.generateFixedLengthRandomNumber(OTP_DIGITS_LENGTH);
+        // Sending OTP to mobile number
+        await sendOTPToMobile(req.body.mobileNumber, otp);
+        // Store OTP
+        await ForgetOTP.create({
+            vallidTill: new Date().getTime() + parseInt(OTP_VALIDITY),
+            otp: otp,
+            userId: user.id
+        });
+        res.status(200).json({
+            success: true,
+            message: `OTP send to ${req.body.mobileNumber}!`,
+            data: {
+                mobileNumber: req.body.mobileNumber
+            }
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.otpVerificationByMobile = async (req, res) => {
+    try {
+        // Validate body
+        const { error } = otpVerificationByMobile(req.body);
+        if (error) {
+            return res.status(400).send(error.details[0].message);
+        }
+        const { mobileNumber, otp } = req.body;
+        // Is Mobile Otp exist
+        const isOtp = await ForgetOTP.findOne({
+            where: {
+                otp: otp
+            }
+        });
+        if (!isOtp) {
+            return res.status(400).send({
+                success: false,
+                message: `Invalid OTP!`
+            });
+        }
+        // Checking is user present or not
+        const user = await User.findOne({
+            where: {
+                [Op.and]: [
+                    { mobileNumber: mobileNumber }, { id: isOtp.userId }
+                ]
+            }
+        });
+        if (!user) {
+            return res.status(400).send({
+                success: false,
+                message: "No Details Found. Register Now!"
+            });
+        }
+        // is email otp expired?
+        const isOtpExpired = new Date().getTime() > parseInt(isOtp.validTill);
+        if (isOtpExpired) {
+            await ForgetOTP.destroy({ where: { userId: isOtp.userId } });
+            return res.status(400).send({
+                success: false,
+                message: `OTP expired!`
+            });
+        }
+        await ForgetOTP.destroy({ where: { userId: isOtp.userId } });
+        // generate JWT Token
+        const authToken = jwt.sign(
+            {
+                id: user.id,
+                email: req.body.email
+            },
+            JWT_SECRET_KEY_USER,
+            { expiresIn: JWT_VALIDITY } // five day
+        );
+        res.status(201).send({
+            success: true,
+            message: `OTP verify successfully!`,
+            data: user,
+            authToken: authToken
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+}

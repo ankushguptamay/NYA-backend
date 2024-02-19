@@ -3,7 +3,7 @@ const Instructor = db.instructor;
 const InstructorUpdation = db.instructorUpdation;
 const EmailCredential = db.emailCredential;
 const ForgetOTP = db.forgetOTP;
-const { loginUser, registerInstructor, changePassword, updateInstructor, sendOTP, verifyOTP, generatePassword } = require("../../Middlewares/Validate/validateUser");
+const { loginPassword, registerInstructorPassword, changePassword, updateInstructor, sendOTP, verifyOTPForPassword, generatePassword, registerInstructorByMobile } = require("../../Middlewares/Validate/validateUser");
 const { JWT_SECRET_KEY_INSTRUCTOR, JWT_VALIDITY, FORGET_OTP_VALIDITY, OTP_DIGITS_LENGTH } = process.env;
 const emailOTP = require('../../Util/generateOTP');
 const { sendEmail } = require("../../Util/sendEmail");
@@ -25,10 +25,10 @@ const SALT = 10;
 // approveInstructorUpdation
 // disApproveInstructorUpdation
 
-exports.register = async (req, res) => {
+exports.registerInstructorPassword = async (req, res) => {
     try {
         // Validate Body
-        const { error } = registerInstructor(req.body);
+        const { error } = registerInstructorPassword(req.body);
         if (error) {
             return res.status(400).send(error.details[0].message);
         }
@@ -81,10 +81,10 @@ exports.register = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
+exports.loginPassword = async (req, res) => {
     try {
         // Validate Body
-        const { error } = loginUser(req.body);
+        const { error } = loginPassword(req.body);
         if (error) {
             console.log(error);
             return res.status(400).send(error.details[0].message);
@@ -690,10 +690,10 @@ exports.sendOTPForForgetPassword = async (req, res) => {
     }
 };
 
-exports.verifyOTP = async (req, res) => {
+exports.verifyOTPForPassword = async (req, res) => {
     try {
         // Validate body
-        const { error } = verifyOTP(req.body);
+        const { error } = verifyOTPForPassword(req.body);
         if (error) {
             return res.status(400).send(error.details[0].message);
         }

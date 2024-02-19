@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { register, login, changePassword, getInstitute, updateInstitute, sendOTPForForgetPassword, verifyOTP, generatePassword } = require('../Controllers/User/instituteController');
+const { registerInstitutePassword, loginByPassword, changePassword, getInstitute, updateInstitute, sendOTPForForgetPassword, verifyOTPForPassword, generatePassword } = require('../Controllers/User/instituteController');
 const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
 const { createQuiz, getQuizForCreater, getQuizById, updateQuiz } = require('../Controllers/User/quizController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
@@ -16,14 +16,14 @@ const { isInstitute } = require('../Middlewares/isPresent');
 const uploadImage = require('../Middlewares/UploadFile/uploadImages');
 
 // User
-router.post("/register", register);
-router.post("/login", login);
+router.post("/registerPassword", registerInstitutePassword);
+router.post("/loginByPassword", loginByPassword);
 router.post("/changePassword", verifyInstituteToken, changePassword);
+router.post("/sendOTPPassword", sendOTPForForgetPassword);
+router.post("/verifyOTPPassword", verifyOTPForPassword);
+router.post("/generatePassword", generatePassword);
 router.get("/institute", verifyInstituteToken, getInstitute);
 router.put("/updateInstitute", verifyInstituteToken, updateInstitute);
-router.post("/sendOTP", sendOTPForForgetPassword);
-router.post("/verifyOTP", verifyOTP);
-router.post("/generatePassword", generatePassword);
 
 // Event
 router.post("/createEvent", verifyInstituteToken, isInstitute, uploadImage.single("eventImage"), createEvent);

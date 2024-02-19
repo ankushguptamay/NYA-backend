@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { register, login, changePassword, getUser, sendOTPForForgetPassword, verifyOTP, generatePassword } = require('../Controllers/User/userController');
+const { registerByPassword, loginByPassword, changePassword, getUser, sendOTPForgetPassword, verifyOTPForPassword, generatePassword,
+    registerByMobile, loginByMobile, otpVerificationByMobile } = require('../Controllers/User/userController');
 const { getEventForUser, getEventById } = require('../Controllers/User/eventController');
 const { bookEvent, myEventForUser } = require('../Controllers/User/event_userController');
 const { getQuizForUser, getQuizById } = require('../Controllers/User/quizController');
@@ -15,13 +16,16 @@ const { verifyUserToken } = require('../Middlewares/varifyToken');
 const { isUser } = require('../Middlewares/isPresent');
 
 // User
-router.post("/register", register);
-router.post("/login", login);
+router.post("/registerByPassword", registerByPassword);
+router.post("/loginByPassword", loginByPassword);
+router.post("/sendOTPPassword", sendOTPForgetPassword);
+router.post("/verifyOTPPassword", verifyOTPForPassword);
+router.post("/generateNewPassword", generatePassword);
 router.post("/changePassword", verifyUserToken, changePassword);
+router.post("/registerByMobile", registerByMobile);
+router.post("/loginByMobile", loginByMobile);
+router.post("/otpVerificationByMobile", otpVerificationByMobile);
 router.get("/user", verifyUserToken, getUser);
-router.post("/sendOTP", sendOTPForForgetPassword);
-router.post("/verifyOTP", verifyOTP);
-router.post("/generatePassword", generatePassword);
 
 // Event
 router.get("/events", getEventForUser);
