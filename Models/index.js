@@ -37,6 +37,7 @@ db.instructorUpdation = require('./User/UpdateRecord/updateInstructorModel.js')(
 db.instructor = require('./User/instructorModel.js')(sequelize, Sequelize);
 db.event = require('./User/eventModel.js')(sequelize, Sequelize);
 db.eventUpdation = require('./User/UpdateRecord/updateEventModel.js')(sequelize, Sequelize);
+db.updateQuiz = require('./User/UpdateRecord/updateQuizModel.js')(sequelize, Sequelize);
 db.event_user = require('./User/event_userModel.js')(sequelize, Sequelize);
 
 // Admin Course Association
@@ -57,6 +58,9 @@ db.instructorUpdation.belongsTo(db.instructor, { foreignKey: "instructorId", as:
 
 db.event.hasMany(db.eventUpdation, { foreignKey: "eventId", as: "eventUpdations" });
 db.eventUpdation.belongsTo(db.event, { foreignKey: "eventId", as: "event" });
+
+db.quiz.hasMany(db.updateQuiz, { foreignKey: "quizId", as: "eventUpdations" });
+db.updateQuiz.belongsTo(db.quiz, { foreignKey: "quizId", as: "event" });
 
 // Event and event_user
 db.event.hasMany(db.event_user, { foreignKey: "eventId", as: "event_user" });
@@ -80,5 +84,8 @@ db.event_user.belongsTo(db.user, { foreignKey: "userId", as: "user" });
 //         });
 //     }
 // }).catch((err) => { console.log(err) });
+
+queryInterface.changeColumn("quizs", "approvedByAdmin", { type: DataTypes.BOOLEAN }).then((res) => { console.log(res) }).catch((err) => { console.log(err) });
+queryInterface.changeColumn("events", "approvedByAdmin", { type: DataTypes.BOOLEAN }).then((res) => { console.log(res) }).catch((err) => { console.log(err) });
 
 module.exports = db;

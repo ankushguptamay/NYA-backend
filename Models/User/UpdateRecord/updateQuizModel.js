@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const Quiz= sequelize.define("quizs", {
-        id: { 
+    const QuizUpdation = sequelize.define("quizUpdations", {
+        id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         imageFileName: {
             type: DataTypes.STRING
         },
-        createrId:{
+        createrId: {
             type: DataTypes.STRING
         },
         approvedByAdmin: {
@@ -41,5 +41,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         paranoid: true
     });
-    return Quiz;
+    return QuizUpdation;
 };
+
+// quizId

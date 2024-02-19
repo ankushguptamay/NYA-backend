@@ -27,8 +27,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
         approvedByAdmin: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
+            type: DataTypes.BOOLEAN
         },
         createrId:{
             type: DataTypes.STRING

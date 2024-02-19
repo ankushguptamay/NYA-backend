@@ -10,7 +10,7 @@ const { getAllInstitute, approveInstituteRegistration, disApproveInstituteRegist
 const { getAllInstructor, approveInstructorRegistration, disApproveInstructorRegistration, getAllInstructorUpdation, disApproveInstructorUpdation, approveInstructorUpdation } = require('../Controllers/User/instructorController');
 const { getEventForAdmin, approveEventCreation, disApproveEventCreation, getEventById, approveEventUpdation, disApproveEventUpdation, getEventUpdationForAdmin } = require('../Controllers/User/eventController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
-const { getQuizForAdmin, approveQuizCreation, disApproveQuizCreation, getQuizById } = require('../Controllers/User/quizController');
+const { getQuizForAdmin, approveQuizCreation, disApproveQuizCreation, getQuizById, getQuizUpdationForAdmin, approveQuizUpdation, disApproveQuizUpdation } = require('../Controllers/User/quizController');
 const { createCelebrity, getCelebrity, updateCelebrity, deleteCelebrity } = require('../Controllers/Admin/celebrityController');
 
 //middleware
@@ -81,6 +81,9 @@ router.get("/quizs", verifyAdminToken, isAdmin, getQuizForAdmin);
 router.get("/quizs/:id", verifyAdminToken, isAdmin, getQuizById);
 router.put("/approveQuizCreation/:id", verifyAdminToken, isAdmin, approveQuizCreation);
 router.put("/disApproveQuizCreation/:id", verifyAdminToken, isAdmin, disApproveQuizCreation);
+router.put("/approveQuizUpdation/:id", verifyAdminToken, isAdmin, approveQuizUpdation);
+router.put("/disApproveQuizUpdation/:id", verifyAdminToken, isAdmin, disApproveQuizUpdation);
+router.get("/getQuizUpdation", verifyAdminToken, isAdmin, getQuizUpdationForAdmin);
 
 // Celebrity
 router.post("/createCelebrity", verifyAdminToken, isAdmin, createCelebrity);

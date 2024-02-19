@@ -17,6 +17,7 @@ const fs = require('fs');
 // updateEvent
 // approveEventUpdation
 // disApproveEventUpdation
+// getEventUpdationForAdmin
 
 exports.createEvent = async (req, res) => {
     try {
@@ -43,7 +44,7 @@ exports.createEvent = async (req, res) => {
         deleteSingleFile(req.file.path);
         const fileAWSPath = response.Location;
         // Create event in database
-        await Event.create({
+        const event = await Event.create({
             date_time: date_time,
             eventName: eventName,
             location: location,
@@ -51,6 +52,17 @@ exports.createEvent = async (req, res) => {
             imagePath: fileAWSPath,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
+            createrId: createrId
+        });
+        await EventUpdation.create({
+            date_time: date_time,
+            eventName: eventName,
+            location: location,
+            aboutEvent: aboutEvent,
+            filePath: fileAWSPath,
+            imageName: req.file.originalname,
+            imageFileName: req.file.filename,
+            eventId: event.id,
             createrId: createrId
         });
         // Send final success response
@@ -289,6 +301,10 @@ exports.approveEventCreation = async (req, res) => {
             ...event,
             approvedByAdmin: true
         });
+        // update updation request
+        await EventUpdation.update({ approvedByAdmin: true }, { where: { eventId: req.params.id } });
+        // Soft delete updation request
+        await EventUpdation.destroy({ where: { eventId: req.params.id } });
         // Send final success response
         res.status(200).send({
             success: true,
@@ -320,6 +336,10 @@ exports.disApproveEventCreation = async (req, res) => {
             ...event,
             approvedByAdmin: false
         });
+        // update updation request
+        await EventUpdation.update({ approvedByAdmin: false }, { where: { eventId: req.params.id } });
+        // Soft delete updation request
+        await EventUpdation.destroy({ where: { eventId: req.params.id } });
         // Send final success response
         res.status(200).send({
             success: true,
@@ -425,7 +445,7 @@ exports.approveEventUpdation = async (req, res) => {
             imageFileName: eventUpdation.imageFileName
         });
         // update updation request
-        await eventUpdation.update({ where: { approvedByAdmin: true } });
+        await eventUpdation.update({ approvedByAdmin: true });
         // Soft delete updation request
         await eventUpdation.destroy();
         // Send final success response
@@ -455,7 +475,7 @@ exports.disApproveEventUpdation = async (req, res) => {
             });
         }
         // update updation request
-        await eventUpdation.update({ where: { approvedByAdmin: true } });
+        await eventUpdation.update({ approvedByAdmin: false });
         // Soft delete updation request
         await eventUpdation.destroy();
         // Send final success response
