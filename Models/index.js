@@ -85,7 +85,7 @@ db.event_user.belongsTo(db.user, { foreignKey: "userId", as: "user" });
 //     }
 // }).catch((err) => { console.log(err) });
 
-queryInterface.changeColumn("quizs", "approvedByAdmin", { type: DataTypes.BOOLEAN }).then((res) => { console.log(res) }).catch((err) => { console.log(err) });
-queryInterface.changeColumn("events", "approvedByAdmin", { type: DataTypes.BOOLEAN }).then((res) => { console.log(res) }).catch((err) => { console.log(err) });
+// queryInterface.changeColumn("quizs", "approvedByAdmin", { type: DataTypes.BOOLEAN }).then((res) => { console.log(res) }).catch((err) => { console.log(err) });
+// queryInterface.changeColumn("events", "approvedByAdmin", { type: DataTypes.BOOLEAN }).then((res) => { console.log(res) }).catch((err) => { console.log(err) });
 
 module.exports = db;
