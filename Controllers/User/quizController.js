@@ -1,6 +1,6 @@
 const db = require('../../Models');
 const Quiz = db.quiz;
-const QuizUpdation = db.QuizUpdation;
+const QuizUpdation = db.quizUpdation;
 const { createQuiz } = require("../../Middlewares/Validate/validateUser");
 const { deleteSingleFile } = require('../../Util/deleteFile');
 const { Op } = require('sequelize');
