@@ -47,6 +47,6 @@ router.get("/subCategories", getSubCategoryForUser);
 router.get("/subCategories/:categoryId", getSubCategoryForUserByCategoryId);
 
 // Celebrity
-router.get("/celebrities", verifyUserToken, isUser, getCelebrity);
+router.get("/celebrities", getCelebrity);
 
 module.exports = router;
