@@ -199,13 +199,6 @@ exports.getQuizForAdmin = async (req, res) => {
 
 exports.getQuizForUser = async (req, res) => {
     try {
-        const createrId = req.body.createrId;
-        if (!createrId) {
-            return res.status(400).send({
-                success: false,
-                message: "Instructor or institute id should be present!"
-            });
-        }
         const { page, limit } = req.query;
         // Pagination
         const recordLimit = parseInt(limit) || 10;
@@ -216,8 +209,7 @@ exports.getQuizForUser = async (req, res) => {
             currentPage = parseInt(page);
         }
         // Search 
-        const condition = [{ approvedByAdmin: true },
-        { createrId: createrId }];
+        const condition = [{ approvedByAdmin: true }];
         // Count All Quiz
         const totalQuiz = await Quiz.count({
             where: {
