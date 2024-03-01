@@ -6,7 +6,7 @@ const { registerByPassword, loginByPassword, changePassword, getUser, sendOTPFor
 const { getEventForUser, getEventById } = require('../Controllers/User/eventController');
 const { bookEvent, myEventForUser } = require('../Controllers/User/event_userController');
 const { getQuizForUser, getQuizById } = require('../Controllers/User/quizController');
-const { getAasanaForUser, getAasanaBySubCategoryId } = require('../Controllers/Admin/aasanaController');
+const { getAasanaForUser, getAasanaBySubCategoryId, getAasanaByCategoryId } = require('../Controllers/Admin/aasanaController');
 const { getCategoryForUser } = require('../Controllers/Admin/categoryController');
 const { getSubCategoryForUser, getSubCategoryForUserByCategoryId } = require('../Controllers/Admin/subCategoryController');
 const { getCelebrity } = require('../Controllers/Admin/celebrityController');
@@ -40,6 +40,7 @@ router.get("/quizs/:id", verifyUserToken, isUser, getQuizById);
 // Aasana
 router.get("/aasanas", getAasanaForUser);
 router.get("/aasanas/:subCategoryId", getAasanaBySubCategoryId);
+router.get("/aasanas/:categoryId", getAasanaByCategoryId);
 // Category
 router.get("/categories", getCategoryForUser);
 // SubCategory
