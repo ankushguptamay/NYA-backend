@@ -1,9 +1,12 @@
 module.exports = (sequelize, DataTypes) => {
-    const Quiz= sequelize.define("quizs", {
-        id: { 
+    const Quiz = sequelize.define("quizs", {
+        id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
+        },
+        quizTitle: {
+            type: DataTypes.STRING,
         },
         quizName: {
             type: DataTypes.STRING,
@@ -32,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         imageFileName: {
             type: DataTypes.STRING
         },
-        createrId:{
+        createrId: {
             type: DataTypes.STRING
         },
         approvedByAdmin: {

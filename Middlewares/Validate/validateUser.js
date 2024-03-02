@@ -87,6 +87,7 @@ exports.updateInstructor = (data) => {
 
 exports.createQuiz = (data) => {
     const schema = joi.object().keys({
+        quizTitle: joi.string().required(),
         quizName: joi.string().required(),
         details: joi.string().required(),
         points: joi.string().required(),

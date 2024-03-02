@@ -35,7 +35,7 @@ exports.createQuiz = async (req, res) => {
         }
         const create = req.instructor ? req.instructor : req.institute;
         const createrId = create.id;
-        const { quizName, details, question, points, option, answer } = req.body;
+        const { quizName, details, question, points, option, answer, quizTitle } = req.body;
         // Uploading S3
         const imagePath = `./Resources/${(req.file.filename)}`
         const fileContent = fs.readFileSync(imagePath);
@@ -44,6 +44,7 @@ exports.createQuiz = async (req, res) => {
         const fileAWSPath = response.Location;
         // Create Quiz in database
         const quiz = await Quiz.create({
+            quizTitle: quizTitle,
             quizName: quizName,
             details: details,
             question: question,
@@ -56,6 +57,7 @@ exports.createQuiz = async (req, res) => {
             createrId: createrId
         });
         await QuizUpdation.create({
+            quizTitle: quizTitle,
             quizName: quizName,
             details: details,
             question: question,
@@ -99,6 +101,7 @@ exports.getQuizForCreater = async (req, res) => {
         if (search) {
             condition.push({
                 [Op.or]: [
+                    { quizTitle: { [Op.substring]: search } },
                     { quizName: { [Op.substring]: search } },
                     { answer: { [Op.substring]: search } },
                     { question: { [Op.substring]: search } },
@@ -156,6 +159,7 @@ exports.getQuizForAdmin = async (req, res) => {
         if (search) {
             condition.push({
                 [Op.or]: [
+                    { quizTitle: { [Op.substring]: search } },
                     { quizName: { [Op.substring]: search } },
                     { answer: { [Op.substring]: search } },
                     { question: { [Op.substring]: search } },
@@ -380,7 +384,7 @@ exports.updateQuiz = async (req, res) => {
                 message: "Such quiz is not present!"
             });
         }
-        const { quizName, details, question, points, option, answer } = req.body;
+        const { quizName, details, question, points, option, answer, quizTitle } = req.body;
         // Uploading S3
         const imagePath = `./Resources/${(req.file.filename)}`
         const fileContent = fs.readFileSync(imagePath);
@@ -389,6 +393,7 @@ exports.updateQuiz = async (req, res) => {
         const fileAWSPath = response.Location;
         // Create Quiz in database
         await QuizUpdation.create({
+            quizTitle: quizTitle,
             quizName: quizName,
             details: details,
             question: question,
@@ -436,6 +441,7 @@ exports.approveQuizUpdation = async (req, res) => {
         // Update
         await quiz.update({
             ...quiz,
+            quizTitle: quizUpdation.quizTitle,
             quizName: quizUpdation.quizName,
             details: quizUpdation.details,
             question: quizUpdation.question,
@@ -509,6 +515,7 @@ exports.getQuizUpdationForAdmin = async (req, res) => {
         if (search) {
             condition.push({
                 [Op.or]: [
+                    { quizTitle: { [Op.substring]: search } },
                     { quizName: { [Op.substring]: search } },
                     { question: { [Op.substring]: search } }
                 ]

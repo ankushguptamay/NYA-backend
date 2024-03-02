@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
         },
+        quizTitle: {
+            type: DataTypes.STRING,
+        },
         quizName: {
             type: DataTypes.STRING,
         },
