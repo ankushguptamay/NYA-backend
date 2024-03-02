@@ -85,8 +85,8 @@ db.event_user.belongsTo(db.user, { foreignKey: "userId", as: "user" });
 //     }
 // }).catch((err) => { console.log(err) });
 
-// queryInterface.addColumn("quizUpdations", "quizTitle", { type: DataTypes.STRING }).then((res) => { console.log("QuizUpdation" + res[0].info) }).catch((err) => { console.log(err) });
-queryInterface.addColumn("quizs", "quizTitle", { type: DataTypes.STRING }).then((res) => { console.log("Quiz " + res[0].info) }).catch((err) => { console.log(err) });
+queryInterface.addColumn("quizUpdations", "quizTitle", { type: DataTypes.STRING }).then((res) => { console.log("QuizUpdation" + res[0].info) }).catch((err) => { console.log(err) });
+// queryInterface.addColumn("quizs", "quizTitle", { type: DataTypes.STRING }).then((res) => { console.log("Quiz " + res[0].info) }).catch((err) => { console.log(err) });
 // queryInterface.removeColumn("quizs", "quizTitle").then((res) => { console.log(res) }).catch((err) => { console.log(err) });
 
 module.exports = db;
