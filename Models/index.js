@@ -39,6 +39,8 @@ db.event = require('./User/eventModel.js')(sequelize, Sequelize);
 db.eventUpdation = require('./User/UpdateRecord/updateEventModel.js')(sequelize, Sequelize);
 db.quizUpdation = require('./User/UpdateRecord/updateQuizModel.js')(sequelize, Sequelize);
 db.event_user = require('./User/event_userModel.js')(sequelize, Sequelize);
+db.quiz_userAnswer = require('./User/quiz_userAnswerModel.js')(sequelize, Sequelize);
+db.quizResult = require('./User/quizResultModel.js')(sequelize, Sequelize);
 
 // Admin Course Association
 db.category.hasMany(db.subCategory, { foreignKey: "categoryId", as: "subCategories" });
@@ -69,6 +71,18 @@ db.event_user.belongsTo(db.event, { foreignKey: "eventId", as: "event" });
 // user and event_user
 db.user.hasMany(db.event_user, { foreignKey: "userId", as: "event_user" });
 db.event_user.belongsTo(db.user, { foreignKey: "userId", as: "user" });
+
+// Quiz and quiz_userAnswer
+db.quiz.hasMany(db.quiz_userAnswer, { foreignKey: "quizId", as: "quiz_userAnswer" });
+db.quiz_userAnswer.belongsTo(db.quiz, { foreignKey: "quizId", as: "quiz" });
+
+// user and quiz_userAnswer
+db.user.hasMany(db.quiz_userAnswer, { foreignKey: "userId", as: "quiz_userAnswer" });
+db.quiz_userAnswer.belongsTo(db.user, { foreignKey: "userId", as: "user" });
+
+// user and quizResult
+db.user.hasMany(db.quizResult, { foreignKey: "userId", as: "quizResult" });
+db.quizResult.belongsTo(db.user, { foreignKey: "userId", as: "user" });
 
 // db.emailCredential.findOne({
 //     where: {
