@@ -44,8 +44,8 @@ router.get("/quizResult", verifyUserToken, isUser, myQuizResult);
 
 // Aasana
 router.get("/aasanas", getAasanaForUser);
-router.get("/aasanas/:subCategoryId", getAasanaBySubCategoryId);
-router.get("/aasanas/:categoryId", getAasanaByCategoryId);
+router.get("/aasanasBySubCategory/:subCategoryId", getAasanaBySubCategoryId);
+router.get("/aasanasByCategory/:categoryId", getAasanaByCategoryId);
 // Category
 router.get("/categories", getCategoryForUser);
 // SubCategory
