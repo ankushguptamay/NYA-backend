@@ -9,6 +9,7 @@ const { getAasanaForUser, getAasanaBySubCategoryId } = require('../Controllers/A
 const { getCategoryForUser } = require('../Controllers/Admin/categoryController');
 const { getSubCategoryForUser, getSubCategoryForUserByCategoryId } = require('../Controllers/Admin/subCategoryController');
 const { getCelebrity } = require('../Controllers/Admin/celebrityController');
+const { submitQuizAnswer, quizResultForAttempter } = require('../Controllers/User/quiz_userAnswerController');
 
 //middleware
 const { verifyInstructorToken } = require('../Middlewares/varifyToken');
@@ -37,6 +38,10 @@ router.post("/createQuiz", verifyInstructorToken, isInstructor, uploadImage.sing
 router.get("/quizs", verifyInstructorToken, isInstructor, getQuizForCreater);
 router.get("/quizs/:id", verifyInstructorToken, isInstructor, getQuizById);
 router.put("/updateQuiz/:id", verifyInstructorToken, isInstructor, uploadImage.single("quizImage"), updateQuiz);
+
+// Quiz Answer
+router.post("/submitAnswer", verifyInstructorToken, isInstructor, submitQuizAnswer);
+router.get("/quizResult", verifyInstructorToken, isInstructor, quizResultForAttempter);
 
 // Aasana
 router.get("/aasanas", getAasanaForUser);

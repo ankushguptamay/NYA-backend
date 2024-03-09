@@ -39,8 +39,8 @@ db.event = require('./User/eventModel.js')(sequelize, Sequelize);
 db.eventUpdation = require('./User/UpdateRecord/updateEventModel.js')(sequelize, Sequelize);
 db.quizUpdation = require('./User/UpdateRecord/updateQuizModel.js')(sequelize, Sequelize);
 db.event_user = require('./User/event_userModel.js')(sequelize, Sequelize);
-// db.quiz_userAnswer = require('./User/quiz_userAnswerModel.js')(sequelize, Sequelize);
-// db.quizResult = require('./User/quizResultModel.js')(sequelize, Sequelize);
+db.quiz_userAnswer = require('./User/quiz_userAnswerModel.js')(sequelize, Sequelize);
+db.quizResult = require('./User/quizResultModel.js')(sequelize, Sequelize);
 
 // Admin Course Association
 db.category.hasMany(db.subCategory, { foreignKey: "categoryId", as: "subCategories" });
@@ -89,6 +89,6 @@ db.event_user.belongsTo(db.user, { foreignKey: "userId", as: "user" });
 
 // queryInterface.addColumn("quizUpdations", "quizTitle", { type: DataTypes.STRING }).then((res) => { console.log("QuizUpdation" + res[0].info) }).catch((err) => { console.log(err) });
 // queryInterface.addColumn("quizs", "quizTitle", { type: DataTypes.STRING }).then((res) => { console.log("Quiz " + res[0].info) }).catch((err) => { console.log(err) });
-queryInterface.dropTable("quizResults").then((res) => { console.log(res) }).catch((err) => { console.log(err) });
-queryInterface.dropTable("quiz_userAnwers").then((res) => { console.log(res) }).catch((err) => { console.log(err) });
+// queryInterface.dropTable("quizResults").then((res) => { console.log(res) }).catch((err) => { console.log(err) });
+// queryInterface.dropTable("quiz_userAnwers").then((res) => { console.log(res) }).catch((err) => { console.log(err) });
 module.exports = db;

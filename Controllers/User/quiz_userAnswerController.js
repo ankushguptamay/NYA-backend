@@ -43,7 +43,19 @@ exports.submitQuizAnswer = async (req, res) => {
         //     quizId:"ndosnodos",
         //     answer:null
         // }];
-        const userId = req.user.id;
+        let personId;
+        if (req.user) {
+            personId = req.user.id;
+        } else if (req.instructor) {
+            personId = req.instructor.id;
+        } else if (req.institute) {
+            personId = req.institute.id;
+        } else {
+            res.status(400).send({
+                success: false,
+                message: `Attempter is not define!`
+            });
+        }
         const { answer } = req.body;
 
         for (let i = 0; i < answer.length; i++) {
@@ -55,13 +67,13 @@ exports.submitQuizAnswer = async (req, res) => {
             if (quiz) {
                 const isAttempt = await Quiz_UserAnswer.findOne({
                     where: {
-                        userId: userId,
+                        personId: personId,
                         quizId: answer[i].quizId
                     }
                 });
                 if (!isAttempt) {
                     await Quiz_UserAnswer.create({
-                        userId: userId,
+                        personId: personId,
                         quizId: answer[i].quizId,
                         answer: answer[i].answer
                     });
@@ -71,7 +83,7 @@ exports.submitQuizAnswer = async (req, res) => {
         // Find Users answer
         const userAnswer = await Quiz_UserAnswer.findAll({
             where: {
-                userId: userId
+                personId: personId
             }
         });
         const answerQuizId = [];
@@ -82,7 +94,7 @@ exports.submitQuizAnswer = async (req, res) => {
         const quiz = await Quiz.findAll({ where: { id: answerQuizId } });
         if (quiz.length === answerQuizId) {
             const response = await checkAnswer(quiz, userAnswer);
-            const isResult = await QuizResult.findOne({ where: { userId: userId } });
+            const isResult = await QuizResult.findOne({ where: { personId: personId } });
             if (isResult) {
                 await isResult.update({
                     ...isResult,
@@ -97,7 +109,7 @@ exports.submitQuizAnswer = async (req, res) => {
                     skip: response.skip,
                     rigthAnswer: response.rigthAnswer,
                     wrongAnswer: response.wrongAnswer,
-                    userId: userId
+                    personId: personId
                 });
             }
         }
@@ -114,10 +126,22 @@ exports.submitQuizAnswer = async (req, res) => {
     }
 };
 
-exports.myQuizResult = async (req, res) => {
+exports.quizResultForAttempter = async (req, res) => {
     try {
-        const userId = req.user.id;
-        const result = await QuizResult.findOne({ where: { userId: userId } });
+        let personId;
+        if (req.user) {
+            personId = req.user.id;
+        } else if (req.instructor) {
+            personId = req.instructor.id;
+        } else if (req.institute) {
+            personId = req.institute.id;
+        } else {
+            res.status(400).send({
+                success: false,
+                message: `Attempter is not define!`
+            });
+        }
+        const result = await QuizResult.findOne({ where: { personId: personId } });
         res.status(201).send({
             success: true,
             message: `Result fetched successfully!`,
