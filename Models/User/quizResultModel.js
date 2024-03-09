@@ -16,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         skip: {
             type: DataTypes.INTEGER
+        },
+        personId:{
+            type: DataTypes.STRING
         }
     });
     return QuizResult;
