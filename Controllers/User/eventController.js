@@ -18,6 +18,7 @@ const fs = require('fs');
 // approveEventUpdation
 // disApproveEventUpdation
 // getEventUpdationForAdmin
+// softDeleteEvent
 
 exports.createEvent = async (req, res) => {
     try {
@@ -538,6 +539,56 @@ exports.getEventUpdationForAdmin = async (req, res) => {
             totalPage: Math.ceil(totalEvent / recordLimit),
             currentPage: currentPage,
             data: eventUpdation
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.softDeleteEvent = async (req, res) => {
+    try {
+        let condition;
+        let message = 'Event deleted successfully!';
+        if (req.instructor) {
+            condition = {
+                id: req.params.id,
+                createrId: req.instructor.id
+            };
+        } else if (req.institute) {
+            condition = {
+                id: req.params.id,
+                createrId: req.institute.id
+            };
+        } else {
+            condition = {
+                id: req.params.id
+            };
+            message = 'Event soft deleted successfully!';
+        }
+        const event = await Event.findOne({
+            where: condition
+        });
+        if (!event) {
+            return res.status(400).send({
+                success: false,
+                message: "This event is not present!"
+            });
+        }
+        // Soft delete updation request
+        await EventUpdation.destroy({
+            where: {
+                eventId: req.params.id
+            }
+        });
+        // Soft delete 
+        await event.destroy();
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: message
         });
     } catch (err) {
         res.status(500).send({

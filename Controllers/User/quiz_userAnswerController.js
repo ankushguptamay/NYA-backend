@@ -43,6 +43,7 @@ exports.submitQuizAnswer = async (req, res) => {
         //     quizId:"ndosnodos",
         //     answer:null
         // }];
+
         let personId;
         if (req.user) {
             personId = req.user.id;
@@ -51,7 +52,7 @@ exports.submitQuizAnswer = async (req, res) => {
         } else if (req.institute) {
             personId = req.institute.id;
         } else {
-            res.status(400).send({
+            return res.status(400).send({
                 success: false,
                 message: `Attempter is not define!`
             });

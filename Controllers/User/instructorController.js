@@ -3,7 +3,7 @@ const Instructor = db.instructor;
 const InstructorUpdation = db.instructorUpdation;
 const EmailCredential = db.emailCredential;
 const ForgetOTP = db.forgetOTP;
-const { loginPassword, registerInstructorPassword, changePassword, updateInstructor, sendOTP, verifyOTPForPassword, generatePassword, registerInstructorByMobile } = require("../../Middlewares/Validate/validateUser");
+const { loginByPassword, registerInstructorPassword, changePassword, updateInstructor, sendOTP, verifyOTPForPassword, generatePassword, registerInstructorByMobile } = require("../../Middlewares/Validate/validateUser");
 const { JWT_SECRET_KEY_INSTRUCTOR, JWT_VALIDITY, FORGET_OTP_VALIDITY, OTP_DIGITS_LENGTH } = process.env;
 const emailOTP = require('../../Util/generateOTP');
 const { sendEmail } = require("../../Util/sendEmail");
@@ -84,7 +84,7 @@ exports.registerInstructorPassword = async (req, res) => {
 exports.loginPassword = async (req, res) => {
     try {
         // Validate Body
-        const { error } = loginPassword(req.body);
+        const { error } = loginByPassword(req.body);
         if (error) {
             console.log(error);
             return res.status(400).send(error.details[0].message);

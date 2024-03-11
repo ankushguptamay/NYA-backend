@@ -55,14 +55,14 @@ exports.eventBookByUser = async (req, res) => {
     try {
         let condition;
         if (req.admin) {
-            condition = { id: req.params.id }
+            condition = { id: req.params.id };
         } else {
             const create = req.instructor ? req.instructor : req.institute;
             const createrId = create.id;
             condition = {
                 id: req.params.id,
                 createrId: createrId
-            }
+            };
         }
         const event = await Event.findOne({
             where: condition
