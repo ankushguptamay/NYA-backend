@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { registerInstitutePassword, loginByPassword, changePassword, getInstitute, updateInstitute, sendOTPForForgetPassword, verifyOTPForPassword, generatePassword } = require('../Controllers/User/instituteController');
 const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
-const { createQuiz, getQuizForCreater, getQuizById, updateQuiz } = require('../Controllers/User/quizController');
+const { createQuiz, getQuizForCreater, getQuizById, updateQuiz, getQuizForUser } = require('../Controllers/User/quizController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
 const { getAasanaForUser, getAasanaBySubCategoryId } = require('../Controllers/Admin/aasanaController');
 const { getCategoryForUser } = require('../Controllers/Admin/categoryController');
@@ -34,6 +34,7 @@ router.put("/updateEvent/:id", verifyInstituteToken, isInstitute, uploadImage.si
 router.get("/eventUsers/:id", verifyInstituteToken, isInstitute, eventBookByUser);
 
 // Quiz
+router.get("/allQuizs", getQuizForUser);
 router.post("/createQuiz", verifyInstituteToken, isInstitute, uploadImage.single("quizImage"), createQuiz);
 router.get("/quizs", verifyInstituteToken, isInstitute, getQuizForCreater);
 router.get("/quizs/:id", verifyInstituteToken, isInstitute, getQuizById);

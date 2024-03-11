@@ -81,39 +81,6 @@ exports.submitQuizAnswer = async (req, res) => {
                 }
             }
         }
-        // Find Users answer
-        const userAnswer = await Quiz_UserAnswer.findAll({
-            where: {
-                personId: personId
-            }
-        });
-        const answerQuizId = [];
-        for (let i = 0; i < userAnswer.length; i++) {
-            answerQuizId.push(userAnswer[i].quizId);
-        }
-        // FindAll Quiz from database
-        const quiz = await Quiz.findAll({ where: { id: answerQuizId } });
-        if (quiz.length === answerQuizId) {
-            const response = await checkAnswer(quiz, userAnswer);
-            const isResult = await QuizResult.findOne({ where: { personId: personId } });
-            if (isResult) {
-                await isResult.update({
-                    ...isResult,
-                    attemptQuiz: response.attempt,
-                    skip: response.skip,
-                    rigthAnswer: response.rigthAnswer,
-                    wrongAnswer: response.wrongAnswer
-                });
-            } else {
-                await QuizResult.create({
-                    attemptQuiz: response.attempt,
-                    skip: response.skip,
-                    rigthAnswer: response.rigthAnswer,
-                    wrongAnswer: response.wrongAnswer,
-                    personId: personId
-                });
-            }
-        }
         res.status(201).send({
             success: true,
             message: `Answer submit successfully!`
@@ -137,10 +104,43 @@ exports.quizResultForAttempter = async (req, res) => {
         } else if (req.institute) {
             personId = req.institute.id;
         } else {
-            res.status(400).send({
+            return res.status(400).send({
                 success: false,
                 message: `Attempter is not define!`
             });
+        }
+        // Find Users answer
+        const userAnswer = await Quiz_UserAnswer.findAll({
+            where: {
+                personId: personId
+            }
+        });
+        const answerQuizId = [];
+        for (let i = 0; i < userAnswer.length; i++) {
+            answerQuizId.push(userAnswer[i].quizId);
+        }
+        // FindAll Quiz from database
+        const quiz = await Quiz.findAll({ where: { id: answerQuizId } });
+        if (quiz.length === answerQuizId.length) {
+            const response = await checkAnswer(quiz, userAnswer);
+            const isResult = await QuizResult.findOne({ where: { personId: personId } });
+            if (isResult) {
+                await isResult.update({
+                    ...isResult,
+                    attemptQuiz: response.attempt,
+                    skip: response.skip,
+                    rigthAnswer: response.rigthAnswer,
+                    wrongAnswer: response.wrongAnswer
+                });
+            } else {
+                await QuizResult.create({
+                    attemptQuiz: response.attempt,
+                    skip: response.skip,
+                    rigthAnswer: response.rigthAnswer,
+                    wrongAnswer: response.wrongAnswer,
+                    personId: personId
+                });
+            }
         }
         const result = await QuizResult.findOne({ where: { personId: personId } });
         res.status(201).send({

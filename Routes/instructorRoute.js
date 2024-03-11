@@ -4,7 +4,7 @@ const router = express.Router();
 const { registerInstructorPassword, loginPassword, changePassword, getInstructor, updateInstructor, sendOTPForForgetPassword, verifyOTPForPassword, generatePassword } = require('../Controllers/User/instructorController');
 const { createEvent, getEventForCreater, getEventById, updateEvent } = require('../Controllers/User/eventController');
 const { eventBookByUser } = require('../Controllers/User/event_userController');
-const { createQuiz, getQuizForCreater, getQuizById, updateQuiz } = require('../Controllers/User/quizController');
+const { createQuiz, getQuizForCreater, getQuizById, updateQuiz, getQuizForUser } = require('../Controllers/User/quizController');
 const { getAasanaForUser, getAasanaBySubCategoryId } = require('../Controllers/Admin/aasanaController');
 const { getCategoryForUser } = require('../Controllers/Admin/categoryController');
 const { getSubCategoryForUser, getSubCategoryForUserByCategoryId } = require('../Controllers/Admin/subCategoryController');
@@ -34,6 +34,7 @@ router.put("/updateEvent/:id", verifyInstructorToken, isInstructor, uploadImage.
 router.get("/eventUsers/:id", verifyInstructorToken, isInstructor, eventBookByUser);
 
 // Quiz
+router.get("/allQuizs", getQuizForUser);
 router.post("/createQuiz", verifyInstructorToken, isInstructor, uploadImage.single("quizImage"), createQuiz);
 router.get("/quizs", verifyInstructorToken, isInstructor, getQuizForCreater);
 router.get("/quizs/:id", verifyInstructorToken, isInstructor, getQuizById);
