@@ -70,7 +70,8 @@ exports.registerInstitutePassword = async (req, res) => {
         res.status(200).send({
             success: true,
             message: 'Registered successfully!',
-            authToken: authToken
+            authToken: authToken,
+            centerName: req.body.centerName
         });
     } catch (err) {
         res.status(500).send({

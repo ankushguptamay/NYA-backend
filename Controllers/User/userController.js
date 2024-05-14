@@ -64,7 +64,8 @@ exports.registerByPassword = async (req, res) => {
         res.status(200).send({
             success: true,
             message: 'Registered successfully!',
-            authToken: authToken
+            authToken: authToken,
+            name: user.name
         });
     } catch (err) {
         res.status(500).send({
