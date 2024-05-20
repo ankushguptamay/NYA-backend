@@ -4,8 +4,14 @@ const Category = db.category;
 const { validateSubCategory } = require("../../Middlewares/Validate/validateAdmin");
 const { deleteSingleFile } = require('../../Util/deleteFile');
 const { Op } = require('sequelize');
-const { s3UploadObject, s3DeleteObject } = require("../../Util/fileToS3");
-const fs = require('fs');
+
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 exports.createSubCategory = async (req, res) => {
     try {
@@ -37,17 +43,16 @@ exports.createSubCategory = async (req, res) => {
                 message: "Subcategory name should be unique!"
             });
         }
-        // Uploading S3
         const imagePath = `./Resources/${(req.file.filename)}`
-        const fileContent = fs.readFileSync(imagePath);
-        const response = await s3UploadObject(req.file.filename, fileContent);
+        const response = await cloudinary.uploader.upload(imagePath);
+        // delete file from resource/servere
         deleteSingleFile(req.file.path);
-        const fileAWSPath = response.Location;
         // Create category
         await SubCategory.create({
+            cloudinaryFileId: response.public_id,
             subCategoryDescription: subCategoryDescription,
             subCategoryName: subCategoryName,
-            subCategoryImage_Path: fileAWSPath,
+            subCategoryImage_Path: response.secure_url,
             subCategoryImage_Originalname: req.file.originalname,
             subCategoryImage_FileName: req.file.filename,
             categoryId: categoryId
@@ -161,19 +166,23 @@ exports.updateSubCategory = async (req, res) => {
         let imagePath = subCategory.subCategoryImage_Path;
         let imageOriginalName = subCategory.subCategoryImage_Originalname;
         let imageFileName = subCategory.subCategoryImage_FileName;
+        let cloudinaryFileId = subCategory.cloudinaryFileId;
         if (req.file) {
-            const image_Path = `./Resources/${(req.file.filename)}`
-            const fileContent = fs.readFileSync(image_Path);
-            const response = await s3UploadObject(req.file.filename, fileContent);
+            const imageCloudPath = `./Resources/${(req.file.filename)}`
+            const response = await cloudinary.uploader.upload(imageCloudPath);
+            // delete file from resource/servere
             deleteSingleFile(req.file.path);
-            const fileAWSPath = response.Location;
-            imagePath = fileAWSPath;
+            if (cloudinaryFileId) {
+                await cloudinary.uploader.destroy(cloudinaryFileId);
+            }
+            cloudinaryFileId = response.public_id;
+            imagePath = response.secure_url;
             imageOriginalName = req.file.originalname;
             imageFileName = req.file.filename
-            await s3DeleteObject(previousImage);
         }
         // Create Subcategory
         await subCategory.update({
+            cloudinaryFileId: cloudinaryFileId,
             subCategoryDescription: subCategoryDescription,
             subCategoryName: subCategoryName,
             subCategoryImage_Path: imagePath,

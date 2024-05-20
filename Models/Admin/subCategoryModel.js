@@ -20,6 +20,9 @@ module.exports = (sequelize, DataTypes) => {
         subCategoryDescription: {
             type: DataTypes.STRING
         },
+        cloudinaryFileId: {
+            type: DataTypes.STRING
+        },
         publicStatus: {
             type: DataTypes.BOOLEAN,
             defaultValue: false

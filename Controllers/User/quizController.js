@@ -4,8 +4,14 @@ const QuizUpdation = db.quizUpdation;
 const { createQuiz } = require("../../Middlewares/Validate/validateUser");
 const { deleteSingleFile } = require('../../Util/deleteFile');
 const { Op } = require('sequelize');
-const { s3UploadObject, s3DeleteObject } = require("../../Util/fileToS3");
-const fs = require('fs');
+
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 // createQuiz
 // getQuizForCreater
@@ -36,14 +42,14 @@ exports.createQuiz = async (req, res) => {
         const create = req.instructor ? req.instructor : req.institute;
         const createrId = create.id;
         const { quizName, details, question, points, option, answer, quizTitle } = req.body;
-        // Uploading S3
-        const imagePath = `./Resources/${(req.file.filename)}`
-        const fileContent = fs.readFileSync(imagePath);
-        const response = await s3UploadObject(req.file.filename, fileContent);
+
+        const imageCloudPath = `./Resources/${(req.file.filename)}`
+        const response = await cloudinary.uploader.upload(imageCloudPath);
+        // delete file from resource/servere
         deleteSingleFile(req.file.path);
-        const fileAWSPath = response.Location;
         // Create Quiz in database
         const quiz = await Quiz.create({
+            cloudinaryFileId: response.public_id,
             quizTitle: quizTitle,
             quizName: quizName,
             details: details,
@@ -51,12 +57,13 @@ exports.createQuiz = async (req, res) => {
             points: points,
             option: option,
             answer: answer,
-            imagePath: fileAWSPath,
+            imagePath: response.secure_url,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
             createrId: createrId
         });
         await QuizUpdation.create({
+            cloudinaryFileId: response.public_id,
             quizTitle: quizTitle,
             quizName: quizName,
             details: details,
@@ -64,7 +71,7 @@ exports.createQuiz = async (req, res) => {
             points: points,
             option: option,
             answer: answer,
-            imagePath: fileAWSPath,
+            imagePath: response.secure_url,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
             createrId: createrId,
@@ -385,14 +392,14 @@ exports.updateQuiz = async (req, res) => {
             });
         }
         const { quizName, details, question, points, option, answer, quizTitle } = req.body;
-        // Uploading S3
-        const imagePath = `./Resources/${(req.file.filename)}`
-        const fileContent = fs.readFileSync(imagePath);
-        const response = await s3UploadObject(req.file.filename, fileContent);
+
+        const imageCloudPath = `./Resources/${(req.file.filename)}`
+        const response = await cloudinary.uploader.upload(imageCloudPath);
+        // delete file from resource/servere
         deleteSingleFile(req.file.path);
-        const fileAWSPath = response.Location;
         // Create Quiz in database
         await QuizUpdation.create({
+            cloudinaryFileId: response.public_id,
             quizTitle: quizTitle,
             quizName: quizName,
             details: details,
@@ -400,7 +407,7 @@ exports.updateQuiz = async (req, res) => {
             points: points,
             option: option,
             answer: answer,
-            imagePath: fileAWSPath,
+            imagePath: response.secure_url,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
             createrId: createrId,
@@ -441,6 +448,7 @@ exports.approveQuizUpdation = async (req, res) => {
         // Update
         await quiz.update({
             ...quiz,
+            cloudinaryFileId: quizUpdation.cloudinaryFileId,
             quizTitle: quizUpdation.quizTitle,
             quizName: quizUpdation.quizName,
             details: quizUpdation.details,

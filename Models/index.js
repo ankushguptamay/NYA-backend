@@ -88,4 +88,11 @@ db.event_user.belongsTo(db.user, { foreignKey: "userId", as: "user" });
 //     }
 // }).catch((err) => { console.log(err) });
 
+queryInterface.addColumn("categories", "cloudinaryFileId", { type: DataTypes.STRING }).then((res) => { console.log("1cloudinaryFileId Added!") }).catch((err) => { console.log(err) });
+queryInterface.addColumn("subCategories", "cloudinaryFileId", { type: DataTypes.STRING }).then((res) => { console.log("2cloudinaryFileId Added!") }).catch((err) => { console.log(err) });
+queryInterface.addColumn("eventUpdations", "cloudinaryFileId", { type: DataTypes.STRING }).then((res) => { console.log("3cloudinaryFileId Added!") }).catch((err) => { console.log(err) });
+// queryInterface.addColumn("quizUpdations", "cloudinaryFileId", { type: DataTypes.STRING }).then((res) => { console.log("4cloudinaryFileId Added!") }).catch((err) => { console.log(err) });
+// queryInterface.addColumn("events", "cloudinaryFileId", { type: DataTypes.STRING }).then((res) => { console.log("5cloudinaryFileId Added!") }).catch((err) => { console.log(err) });
+// queryInterface.addColumn("quizs", "cloudinaryFileId", { type: DataTypes.STRING }).then((res) => { console.log("6cloudinaryFileId Added!") }).catch((err) => { console.log(err) });
+
 module.exports = db;

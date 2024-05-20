@@ -35,6 +35,9 @@ module.exports = (sequelize, DataTypes) => {
         imageFileName: {
             type: DataTypes.STRING
         },
+        cloudinaryFileId: {
+            type: DataTypes.STRING
+        },
         createrId: {
             type: DataTypes.STRING
         },

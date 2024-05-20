@@ -4,8 +4,14 @@ const EventUpdation = db.eventUpdation;
 const { createEvent } = require("../../Middlewares/Validate/validateUser");
 const { deleteSingleFile } = require('../../Util/deleteFile');
 const { Op } = require('sequelize');
-const { s3UploadObject, s3DeleteObject } = require("../../Util/fileToS3");
-const fs = require('fs');
+
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 // createEvent
 // getEventForCreater
@@ -38,29 +44,30 @@ exports.createEvent = async (req, res) => {
         const create = req.instructor ? req.instructor : req.institute;
         const createrId = create.id;
         const { date_time, eventName, location, aboutEvent } = req.body;
-        // Uploading S3
-        const imagePath = `./Resources/${(req.file.filename)}`
-        const fileContent = fs.readFileSync(imagePath);
-        const response = await s3UploadObject(req.file.filename, fileContent);
+
+        const imageCloudPath = `./Resources/${(req.file.filename)}`
+        const response = await cloudinary.uploader.upload(imageCloudPath);
+        // delete file from resource/servere
         deleteSingleFile(req.file.path);
-        const fileAWSPath = response.Location;
         // Create event in database
         const event = await Event.create({
+            cloudinaryFileId: response.public_id,
             date_time: date_time,
             eventName: eventName,
             location: location,
             aboutEvent: aboutEvent,
-            imagePath: fileAWSPath,
+            imagePath: response.secure_url,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
             createrId: createrId
         });
         await EventUpdation.create({
+            cloudinaryFileId: response.public_id,
             date_time: date_time,
             eventName: eventName,
             location: location,
             aboutEvent: aboutEvent,
-            filePath: fileAWSPath,
+            filePath: response.secure_url,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
             eventId: event.id,
@@ -384,19 +391,19 @@ exports.updateEvent = async (req, res) => {
             });
         }
         const { date_time, eventName, location, aboutEvent } = req.body;
-        // Uploading S3
-        const imagePath = `./Resources/${(req.file.filename)}`
-        const fileContent = fs.readFileSync(imagePath);
-        const response = await s3UploadObject(req.file.filename, fileContent);
+
+        const imageCloudPath = `./Resources/${(req.file.filename)}`
+        const response = await cloudinary.uploader.upload(imageCloudPath);
+        // delete file from resource/servere
         deleteSingleFile(req.file.path);
-        const fileAWSPath = response.Location;
         // Create event in database
         await EventUpdation.create({
+            cloudinaryFileId: response.public_id,
             date_time: date_time,
             eventName: eventName,
             location: location,
             aboutEvent: aboutEvent,
-            filePath: fileAWSPath,
+            filePath: response.secure_url,
             imageName: req.file.originalname,
             imageFileName: req.file.filename,
             eventId: event.id,
@@ -437,6 +444,7 @@ exports.approveEventUpdation = async (req, res) => {
         // Update
         await event.update({
             ...event,
+            cloudinaryFileId: eventUpdation.cloudinaryFileId,
             date_time: eventUpdation.date_time,
             eventName: eventUpdation.eventName,
             location: eventUpdation.location,

@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
         categoryImage_FileName: {
             type: DataTypes.STRING(1234)
         },
+        cloudinaryFileId: {
+            type: DataTypes.STRING
+        },
         publicStatus: {
             type: DataTypes.BOOLEAN,
             defaultValue: false

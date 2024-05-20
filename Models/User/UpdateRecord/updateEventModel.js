@@ -29,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
         imageFileName: {
             type: DataTypes.STRING
         },
+        cloudinaryFileId: {
+            type: DataTypes.STRING
+        },
         approvedByAdmin: {
             type: DataTypes.BOOLEAN
         },
