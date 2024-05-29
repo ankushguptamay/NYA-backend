@@ -2,6 +2,7 @@ const db = require('../../Models');
 const Admin = db.admin;
 const EmailCredential = db.emailCredential;
 const ForgetOTP = db.forgetOTP;
+const User = db.user;
 const { adminLogin, adminRegistration } = require("../../Middlewares/Validate/validateAdmin");
 const { changePassword, sendOTP, verifyOTP, generatePassword } = require("../../Middlewares/Validate/validateUser");
 const bcrypt = require('bcryptjs');
@@ -435,3 +436,23 @@ exports.generatePassword = async (req, res) => {
         });
     }
 };
+
+exports.heartAPI = async (req, res) => {
+    try {
+        await User.findOne({
+            where: {
+                id: "bsdhabsidjfei"
+            }
+        });
+        // Send final success response
+        res.status(200).send({
+            success: true,
+            message: `Heart API fired successfully!`
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+}
