@@ -549,7 +549,7 @@ exports.sendOTPForForgetPassword = async (req, res) => {
         if (!isInstructor) {
             return res.status(400).send({
                 success: false,
-                message: 'Sorry! try to login with currect credentials.'
+                message: 'Sorry! try to login with correct credentials.'
             });
         }
         // Generate OTP for Email

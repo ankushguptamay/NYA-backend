@@ -76,14 +76,14 @@ exports.loginAdmin = async (req, res) => {
         if (!isAdmin) {
             return res.status(400).send({
                 success: false,
-                message: 'Sorry! try to login with currect credentials.'
+                message: 'Sorry! try to login with correct credentials.'
             });
         }
         const compairPassword = await bcrypt.compare(password, isAdmin.password);
         if (!compairPassword) {
             return res.status(400).send({
                 success: false,
-                message: 'Sorry! try to login with currect credentials.'
+                message: 'Sorry! try to login with correct credentials.'
             });
         }
         const data = {
@@ -181,7 +181,7 @@ exports.sendOTPForForgetPassword = async (req, res) => {
         if (!isAdmin) {
             return res.status(400).send({
                 success: false,
-                message: 'Sorry! try to login with currect credentials.'
+                message: 'Sorry! try to login with correct credentials.'
             });
         }
         // Generate OTP for Email

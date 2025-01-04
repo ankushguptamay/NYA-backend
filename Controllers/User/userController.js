@@ -284,7 +284,7 @@ exports.sendOTPForgetPassword = async (req, res) => {
         if (!isUser) {
             return res.status(400).send({
                 success: false,
-                message: 'Sorry! try to login with currect credentials.'
+                message: 'Sorry! try to login with correct credentials.'
             });
         }
         // Generate OTP for Email
@@ -615,7 +615,7 @@ exports.loginByMobile = async (req, res) => {
         if (!user) {
             return res.status(400).json({
                 success: false,
-                message: 'Sorry! try to login with currect credentials.'
+                message: 'Sorry! try to login with correct credentials.'
             });
         }
         // Generate OTP for Email
